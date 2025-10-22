@@ -22,10 +22,16 @@ spring:
   # redis配置
   data:
     redis:
-      database: 0
+      database: 5
       host: 127.0.0.1
       port: 6379
       password:
+      lettuce:
+        pool:
+          max-active: 200
+          max-idle: 100
+          min-idle: 20
+          max-wait: 2000ms
   # RabbitMQ配置
   rabbitmq:
     host: localhost
@@ -64,5 +70,5 @@ sa-token:
 # spring事物管理日志
 logging:
   level:
+    root: error
     org.springframework.jdbc.support.JdbcTransactionManager: debug
-    tracer: TRACE

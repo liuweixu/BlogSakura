@@ -1,5 +1,6 @@
 package org.example.blogsakura_java.service.impl;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura_java.configure.ArticleBloomFilter;
@@ -7,6 +8,7 @@ import org.example.blogsakura_java.constants.RabbitMQConstants;
 import org.example.blogsakura_java.mapper.ArticleMapper;
 import org.example.blogsakura_java.service.ViewService;
 import org.redisson.api.RLock;
+import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheEvict;
@@ -128,6 +130,11 @@ public class ViewServiceImpl implements ViewService {
         );
 //        articleMapper.updateViewById(id, result);
         rabbitTemplate.convertAndSend(RabbitMQConstants.VIEW_EXCHANGE, RabbitMQConstants.VIEW_UPDATE_KEY, id);
+    }
+
+    @PostConstruct
+    public void testLog() {
+        log.error("======error=======");
     }
 
 }
