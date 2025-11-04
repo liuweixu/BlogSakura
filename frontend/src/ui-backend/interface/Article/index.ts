@@ -16,4 +16,5 @@ export interface ArticleContent {
   title: string;
   content: string;
   channel_name: string;
+  image_url: string;
 }

@@ -1,6 +1,10 @@
-import axios from "axios"
+import { request } from "@/ui-backend/utils";
 
-// 获取COS密钥信息
-export const getUploadKeyAPI = () => {
-    return axios.get("/api/cos");
-};
+//登录请求
+export function uploadAPI(formData: FormData) {
+    return request({
+      url: "/api/backend/upload/image",
+      method: "POST",
+      data: formData
+    });
+  }

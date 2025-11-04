@@ -27,6 +27,7 @@ function App() {
         const title = res.data.data.title;
         const content = res.data.data.content;
         const channel_id = res.data.data.channel_id;
+        const img_url = res.data.data.image_url;
         const res_channel = await getChannelById(channel_id.toString());
         const channel_name = res_channel.data.name;
         const nowView = res.data.data.view;
@@ -38,6 +39,7 @@ function App() {
           title: title,
           content: content,
           channel_name: channel_name,
+          image_url: img_url,
         });
       } catch (error) {
         console.error("获取文章列表失败:", error);
@@ -55,7 +57,12 @@ function App() {
         <div className="bg-no-repeat bg-cover bg-center h-100 bg-origin-border">
           <img
             className="w-full h-full object-cover"
-            src={"/statics/images/list_14.png"}
+            src={
+              data?.image_url ||
+              `https://api.r10086.com/樱道随机图片api接口.php?图片系列=风景系列${
+                Math.floor(Math.random() * 10) + 1
+              }`
+            }
             alt=""
           />
         </div>

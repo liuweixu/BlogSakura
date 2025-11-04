@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.example</groupId>
-    <artifactId>blogsakura_java</artifactId>
+    <artifactId>BlogSakura</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>blogsakura_java</name>
-    <description>blogsakura_java</description>
+    <name>BlogSakura</name>
+    <description>BlogSakura</description>
     <url/>
     <licenses>
         <license/>
@@ -137,11 +137,23 @@
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.2.9</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
             <version>3.22.0</version>
+        </dependency>
+
+        <!-- 腾讯云 cos 服务 -->
+        <dependency>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+            <version>5.6.257</version>
         </dependency>
     </dependencies>
     <dependencyManagement>

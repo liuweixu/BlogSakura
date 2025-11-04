@@ -18,7 +18,7 @@ export function Feature() {
     getArticleList();
   }, []);
 
-  const features = data.slice(0, 3);
+  const features = data.slice(-3);
 
   function featureList() {
     return (
@@ -46,9 +46,12 @@ export function Feature() {
                   className="transition-all duration-350 ease-in-out scale-100 h-full group-hover:scale-120"
                 >
                   <img
-                    src={`https://api.r10086.com/樱道随机图片api接口.php?图片系列=动漫综合${
-                      Math.floor(Math.random() * 18) + 1
-                    }`}
+                    src={
+                      invoice.image_url ||
+                      `https://api.r10086.com/樱道随机图片api接口.php?图片系列=风景系列${
+                        Math.floor(Math.random() * 10) + 1
+                      }`
+                    }
                     alt=""
                     className="w-full h-full"
                   />

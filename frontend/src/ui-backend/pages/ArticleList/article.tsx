@@ -93,9 +93,7 @@ export const Article = () => {
             <img src="/statics/images/404.png" width={80} height={60} alt="" />
           );
         } else {
-          return (
-            <img src={"https://" + cover || ""} width={80} height={60} alt="" />
-          );
+          return <img src={cover || ""} width={80} height={60} alt="" />;
         }
       },
     },
@@ -186,9 +184,6 @@ export const Article = () => {
               ))}
             </Select>
           </Form.Item>
-          {/* <Form.Item label='日期' name='date'>
-            <RangePicker locale={locale}></RangePicker>
-          </Form.Item> */}
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ marginLeft: 40 }}>
               筛选

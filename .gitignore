@@ -40,9 +40,11 @@ frontend/*.local
 frontend/*.idea
 frontend/.gitignore
 
-src/main/java/org/example/blogsakura_java/test
-src/main/java/org/example/blogsakura_java/test/*
-src/test/java/org/example/blogsakura_java
-src/test/java/org/example/blogsakura_java/*
+src/main/java/org/example/blogsakura/test
+src/main/java/org/example/blogsakura/test/*
+src/test/java/org/example/blogsakura
+src/test/java/org/example/blogsakura/*
 
 ToDO.md
+/src/main/resources/application-dev.yml
+/src/test/java/org/example/blogsakura/

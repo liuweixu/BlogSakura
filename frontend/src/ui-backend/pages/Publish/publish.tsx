@@ -36,10 +36,9 @@ import {
 } from "antd";
 import ReactQuill from "react-quill-new";
 import "./index.css";
-import { Upload, message, notification } from "antd";
-import { getUploadKeyAPI } from "@/ui-backend/apis/upload";
-import COS from "cos-js-sdk-v5";
+import { Upload, notification } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { uploadAPI } from "@/ui-backend/apis/upload";
 
 const { Option } = Select;
 
@@ -54,9 +53,9 @@ const tailLayout = {
 
 export function PublishArticle() {
   const [form] = Form.useForm();
-  const [cos, setCos] = useState<COS | null>(null);
   const [fileValue, setFileValue] = useState<UploadFile[]>([]);
   const [imageType, setImageType] = useState<number>(0);
+  const [location, setLocation] = useState<string>("");
 
   const [channelList, setChannelList] = useState<ChannelItem[]>([]);
   useEffect(() => {
@@ -84,8 +83,9 @@ export function PublishArticle() {
       content,
       channel,
       image_type: imageType,
-      image_url: fileValue.map((item) => item.response.Location)[0],
+      image_url: location,
     };
+    console.log(reqData);
     if (articleId) {
       editArticleAPI(articleId, reqData);
     } else {
@@ -102,76 +102,80 @@ export function PublishArticle() {
     form.resetFields();
   };
 
-  /**
-   * 上传图像部分 + 腾讯云COS
-   */
-  useEffect(() => {
-    const fetchdata = async () => {
-      const res = await getUploadKeyAPI();
-      const SecretId = res.data.data.secretId;
-      const SecretKey = res.data.data.secretKey;
-      const Bucket = res.data.data.bucket;
-      const Region = res.data.data.region;
-
-      //初始化COS实例
-      const cosInstance = new COS({
-        SecretId,
-        SecretKey,
-      });
-
-      // 保存实例 + bucket/region 信息
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (cosInstance as any).bucket = Bucket;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (cosInstance as any).region = Region;
-
-      setCos(cosInstance);
-    };
-    fetchdata();
-  }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const customRequest = async (options: any) => {
-    if (!cos) {
-      message.error("COS 未初始化");
-      return;
-    }
-
-    const { file, onSuccess, onError, onProgress } = options;
-
-    try {
-      cos.uploadFile(
-        {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          Bucket: (cos as any).bucket,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          Region: (cos as any).region,
-          Key: `images/${Date.now()}_${file.name}`, // 保存路径
-          Body: file,
-          SliceSize: 1024 * 1024 * 5, // 5MB 分片
-          onProgress: (progressData) => {
-            onProgress({ percent: progressData.percent * 100 });
-          },
-        },
-        (err, data) => {
-          if (err) {
-            // console.error("上传失败:", err);
-            onError(err);
-          } else {
-            onSuccess(data);
-            message.success("上传成功");
-          }
-        }
-      );
-    } catch (err) {
-      console.error("上传异常:", err);
-      onError(err);
-    }
-  };
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onUploadChange = (value: any) => {
     setFileValue(value.fileList);
+    // 处理上传状态变化
+    if (value.file.status === "done") {
+      notify.success({
+        message: "上传成功",
+        description: "图片已成功上传",
+        placement: "bottomRight",
+      });
+    } else if (value.file.status === "error") {
+      notify.error({
+        message: "上传失败",
+        description: "图片上传失败，请重试",
+        placement: "bottomRight",
+      });
+    }
+  };
+
+  // 自定义上传请求
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const customRequest = async (options: any) => {
+    const { file, onSuccess, onError } = options;
+
+    try {
+      // 调用上传 API
+      const formData = new FormData();
+      formData.append("image", file);
+      const response = await uploadAPI(formData);
+
+      // 根据后端返回的数据结构调整
+      // 假设后端返回格式为 { data: { Location: "xxx" } }
+      const href = response.data?.data;
+      setLocation(href);
+
+      // 更新文件列表，添加响应信息
+      setFileValue((prevList: UploadFile[]) => {
+        return prevList.map((item) => {
+          if (item.uid === file.uid) {
+            return {
+              ...item,
+              status: "done",
+              response: { Location: location },
+            };
+          }
+          return item;
+        });
+      });
+
+      // 调用成功回调
+      onSuccess?.(response.data, file);
+    } catch (error) {
+      // 更新文件列表，标记为错误
+      setFileValue((prevList: UploadFile[]) => {
+        return prevList.map((item) => {
+          if (item.uid === file.uid) {
+            return {
+              ...item,
+              status: "error",
+            };
+          }
+          return item;
+        });
+      });
+
+      // 调用错误回调
+      onError?.(error);
+
+      notify.error({
+        message: "上传失败",
+        description: "图片上传失败，请重试",
+        placement: "bottomRight",
+      });
+    }
   };
 
   /**

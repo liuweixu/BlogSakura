@@ -43,9 +43,11 @@ export function ListWrapper() {
   //对数据库的图像信息进行一定的处理
   const imageGet = (image_url: string) => {
     if (image_url == null) {
-      return "/statics/images/list_14.png";
+      return `https://api.r10086.com/樱道随机图片api接口.php?图片系列=风景系列${
+        Math.floor(Math.random() * 10) + 1
+      }`;
     } else {
-      return "https://" + image_url;
+      return image_url;
     }
   };
 
