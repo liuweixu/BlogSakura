@@ -9,11 +9,14 @@ import {
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Popconfirm, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { isLoginAPI, logoutAPI } from "@/ui-backend/apis/user";
+import { getUserInfoAPI, isLoginAPI, logoutAPI } from "@/ui-backend/apis/user";
+import type { UserVOBackend } from "@/ui-backend/interface/User";
 const { Header, Sider, Content } = Layout;
 
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [userInfo, setUserInfo] = useState<UserVOBackend>();
   //路由跳转
   const navigate = useNavigate();
   //高亮
@@ -28,20 +31,24 @@ const App: React.FC = () => {
   // 实现退出逻辑
   const onLogout = async () => {
     const res = await logoutAPI();
-    // console.log("测试", res);
-    if (res?.data.msg == "success") {
+    setIsLogin(false);
+    if (res?.data.message == "ok") {
       navigate("/backend/login");
     }
   };
 
   //处理未登录时，同样后端界面的情况
-  const [isLogin, setIsLogin] = useState(true);
+  const getIsLogin = async () => {
+    const res = await isLoginAPI();
+    setIsLogin(res?.data.message !== "未登录");
+  };
+  const getUserInfo = async () => {
+    const res = await getUserInfoAPI();
+    setUserInfo(res?.data.data);
+  };
   useEffect(() => {
-    const getIsLogin = async () => {
-      const res = await isLoginAPI();
-      setIsLogin(res?.data.code == 0 ? false : true);
-    };
     getIsLogin();
+    getUserInfo();
   }, []);
   return (
     <>
@@ -68,28 +75,28 @@ const App: React.FC = () => {
                   onClick: () => navigate("/backend/publish"),
                 },
                 {
-                  key: "/backend/articlelist",
+                  key: "/backend/article/list",
                   icon: <UploadOutlined />,
                   label: "文章列表",
-                  onClick: () => navigate("/backend/articlelist"),
+                  onClick: () => navigate("/backend/article/list"),
                 },
                 {
-                  key: "/backend/channellist",
+                  key: "/backend/channel/list",
                   icon: <UploadOutlined />,
                   label: "频道列表",
-                  onClick: () => navigate("/backend/channellist"),
+                  onClick: () => navigate("/backend/channel/list"),
+                },
+                {
+                  key: "/backend/user",
+                  icon: <UploadOutlined />,
+                  label: "用户管理器",
+                  onClick: () => navigate("/backend/user/list"),
                 },
                 {
                   key: "/backend/logging",
                   icon: <UploadOutlined />,
                   label: "日志记录",
                   onClick: () => navigate("/backend/logging"),
-                },
-                {
-                  key: "/backend/setting",
-                  icon: <UploadOutlined />,
-                  label: "设置",
-                  onClick: () => navigate("/backend/setting"),
                 },
               ]}
             />
@@ -112,6 +119,24 @@ const App: React.FC = () => {
                   />
                 </div>
                 <div style={{ marginLeft: "auto" }}>
+                  <Popconfirm
+                    title={
+                      <span>
+                        用户： {userInfo?.userName}
+                        <br />
+                        角色： {userInfo?.userRole}
+                      </span>
+                    }
+                  >
+                    <Button
+                      type="text"
+                      icon={<UserOutlined />}
+                      style={{
+                        fontSize: "16px",
+                        width: 64,
+                      }}
+                    />
+                  </Popconfirm>
                   <Popconfirm
                     title="退出"
                     description="是否退出？"

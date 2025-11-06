@@ -1,26 +1,84 @@
 package org.example.blogsakura.service.impl;
 
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.spring.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
+import org.example.blogsakura.common.exception.BusinessException;
+import org.example.blogsakura.common.exception.ErrorCode;
+import org.example.blogsakura.common.exception.ThrowUtils;
+import org.example.blogsakura.mapper.ArticleMapper;
+import org.example.blogsakura.model.dto.channel.Channel;
 import org.example.blogsakura.mapper.ChannelMapper;
-import org.example.blogsakura.pojo.Channel;
+import org.example.blogsakura.model.dto.channel.ChannelQueryRequest;
+import org.example.blogsakura.model.vo.channel.ChannelVO;
 import org.example.blogsakura.service.ChannelService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+/**
+ * 频道表 服务层实现。
+ *
+ * @author <a href="https://github.com/liuweixu">liuweixu</a>
+ */
 @Service
-public class ChannelServiceImpl implements ChannelService {
+public class ChannelServiceImpl extends ServiceImpl<ChannelMapper, Channel> implements ChannelService {
 
-    @Autowired
-    private ChannelMapper channelMapper;
+    @Resource
+    private ArticleMapper articleMapper;
 
+    /**
+     * 获取供给前端用的频道数据
+     *
+     * @param channel
+     * @return
+     */
     @Override
-    public List<Channel> getChannels() {
-        return channelMapper.getChannels();
+    public ChannelVO getChannelVO(Channel channel) {
+        if (channel == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "频道不存在");
+        }
+        ChannelVO channelVO = new ChannelVO();
+        BeanUtils.copyProperties(channel, channelVO);
+        Long channelVOId = channelVO.getId();
+        long countArticlesByChannelId = articleMapper.countArticlesByChannelId(channelVOId);
+        channelVO.setArticleNumbers(countArticlesByChannelId);
+        return channelVO;
     }
 
     @Override
-    public Channel getChannelById(String id) {
-        return channelMapper.getChannelById(Long.valueOf(id));
+    public List<ChannelVO> getChannelVOList(List<Channel> channelList) {
+        if (channelList == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "频道列表不存在");
+        }
+        return channelList.stream().map(this::getChannelVO).collect(Collectors.toList());
     }
+
+    /**
+     * 分页查询条件
+     *
+     * @param channelQueryRequest
+     * @return
+     */
+    @Override
+    public QueryWrapper getQueryWrapper(ChannelQueryRequest channelQueryRequest) {
+        ThrowUtils.throwIf(channelQueryRequest == null, ErrorCode.PARAMS_ERROR);
+        Long id = channelQueryRequest.getId();
+        String channel = channelQueryRequest.getChannel();
+        LocalDateTime createTime = channelQueryRequest.getCreateTime();
+        LocalDateTime updateTime = channelQueryRequest.getUpdateTime();
+        String sortField = channelQueryRequest.getSortField();
+        String sortOrder = channelQueryRequest.getSortOrder();
+        return QueryWrapper.create()
+                .eq("id", id)
+                .like("channel", channel)
+                .orderBy(sortField, "ascend".equals(sortOrder));
+    }
+
+
 }

@@ -1,11 +1,13 @@
 package org.example.blogsakura.service;
 
-import org.example.blogsakura.pojo.OperateLog;
+import com.mybatisflex.core.service.IService;
+import org.example.blogsakura.model.dto.operateLog.OperateLog;
 
-import java.util.List;
+/**
+ * 操作日志表 服务层。
+ *
+ * @author <a href="https://github.com/liuweixu">liuweixu</a>
+ */
+public interface OperateLogService extends IService<OperateLog> {
 
-public interface OperateLogService {
-    void deleteOperateLogs();
-
-    List<OperateLog> getOperateLogs();
 }

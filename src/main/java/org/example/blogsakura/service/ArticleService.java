@@ -1,66 +1,42 @@
 package org.example.blogsakura.service;
 
-
-import org.example.blogsakura.pojo.Article;
-import org.example.blogsakura.pojo.ArticleInsert;
-import org.example.blogsakura.pojo.ArticleQuery;
-import org.example.blogsakura.pojo.ArticleUpdate;
-import org.springframework.web.multipart.MultipartFile;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.service.IService;
+import org.example.blogsakura.model.dto.article.Article;
+import org.example.blogsakura.model.dto.article.ArticleQueryRequest;
+import org.example.blogsakura.model.dto.user.UserQueryRequest;
+import org.example.blogsakura.model.vo.article.ArticleVO;
 
 import java.util.List;
 
-public interface ArticleService {
+/**
+ * 文章表 服务层。
+ *
+ * @author <a href="https://github.com/liuweixu">liuweixu</a>
+ */
+public interface ArticleService extends IService<Article> {
+
     /**
-     * 获取文章列表
+     * 分页查询条件
      *
-     * @param articleQuery
+     * @param articleQueryRequest
      * @return
      */
-    List<Article> getArticleList(ArticleQuery articleQuery);
+    QueryWrapper getQueryWrapper(ArticleQueryRequest articleQueryRequest);
 
     /**
-     * 前端部分，获取文章列表
+     * 返回后端上的文章信息
      *
+     * @param article
      * @return
      */
-    List<Article> getHomeArticleList();
+    ArticleVO getArticleVO(Article article);
 
     /**
-     * 按照文章id删除文章
+     * 返回后端上的文章列表信息
      *
-     * @param id
-     */
-    void deleteArticleById(String id);
-
-    /**
-     * 按照id获取文章
-     *
-     * @param id
+     * @param articleList
      * @return
      */
-    Article getArticleById(String id);
-
-    /**
-     * 插入文章
-     *
-     * @param articleInsert
-     * @param id
-     */
-    void insertArticle(ArticleInsert articleInsert, String id);
-
-    /**
-     * 更新文章
-     *
-     * @param articleUpdate
-     * @param id
-     */
-    void updateArticle(ArticleUpdate articleUpdate, String id);
-
-    /**
-     * 将上传的图片处理，作为一个File类上传到COS中
-     *
-     * @param file
-     * @return
-     */
-    public String uploadImageToCOS(MultipartFile file);
+    List<ArticleVO> getArticleVOList(List<Article> articleList);
 }

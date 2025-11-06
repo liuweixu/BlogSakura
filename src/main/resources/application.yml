@@ -9,18 +9,6 @@ spring:
     username: root
     password: 12345678
     driver-class-name: com.mysql.cj.jdbc.Driver
-  #    type: com.alibaba.druid.pool.DruidDataSource
-  #    druid:
-  #      stat-view-servlet:
-  #        enabled: true
-  #        url-pattern: /druid/*
-  #        login-username: admin
-  #        login-password: 123456
-  thymeleaf:
-    check-template-location: false
-  # 处理驼峰
-  jackson:
-    property-naming-strategy: SNAKE_CASE
   # redis配置
   data:
     redis:
@@ -45,11 +33,6 @@ spring:
 ## elastic search配置
 elasticsearch:
   url: http://localhost:9200
-
-## mybatis 配置
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:

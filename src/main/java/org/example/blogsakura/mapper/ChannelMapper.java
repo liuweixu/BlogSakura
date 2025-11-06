@@ -1,20 +1,18 @@
 package org.example.blogsakura.mapper;
 
+import com.mybatisflex.core.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.example.blogsakura.pojo.Channel;
+import org.example.blogsakura.model.dto.channel.Channel;
 
-import java.util.List;
-
+/**
+ * 频道表 映射层。
+ *
+ * @author <a href="https://github.com/liuweixu">liuweixu</a>
+ */
 @Mapper
-public interface ChannelMapper {
+public interface ChannelMapper extends BaseMapper<Channel> {
 
-    @Select("select * from channel")
-    public List<Channel> getChannels();
-
-    @Select("select id from channel where name = #{name}")
-    public Long getChannelIdByName(String name);
-
-    @Select("select * from channel where id = #{id}")
-    public Channel getChannelById(Long id);
+    @Select("select * from channel where channel = #{channelName}")
+    public Channel getChannelByChannelName(String channelName);
 }

@@ -14,13 +14,12 @@
 import { useEffect, useState } from "react";
 import {
   getArticleById,
-  getChannelAPI,
+  // getChannelAPI,
   addArticleAPI,
   editArticleAPI,
-  getChannelById,
+  // getChannelById,
 } from "@/ui-backend/apis/article";
 
-import type { ChannelItem } from "@/ui-backend/interface/Publish";
 import { useSearchParams } from "react-router-dom";
 
 import {
@@ -39,6 +38,9 @@ import "./index.css";
 import { Upload, notification } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { uploadAPI } from "@/ui-backend/apis/upload";
+import type { ArticleVOBackend } from "@/ui-backend/interface/Article";
+import { getChannelListAPI } from "@/ui-backend/apis/channel";
+import type { ChannelVOBackend } from "@/ui-backend/interface/Channel";
 
 const { Option } = Select;
 
@@ -57,10 +59,10 @@ export function PublishArticle() {
   const [imageType, setImageType] = useState<number>(0);
   const [location, setLocation] = useState<string>("");
 
-  const [channelList, setChannelList] = useState<ChannelItem[]>([]);
+  const [channelList, setChannelList] = useState<ChannelVOBackend[]>([]);
   useEffect(() => {
     const getChannelList = async () => {
-      const res = await getChannelAPI();
+      const res = await getChannelListAPI();
       setChannelList(res.data.data);
     };
     getChannelList();
@@ -75,21 +77,23 @@ export function PublishArticle() {
 
   //提交成功提示
   const [notify, contextHolder] = notification.useNotification();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [formData, setFormData] = useState<ArticleVOBackend>({});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFinish = (values: any) => {
     const { title, channel, content } = values;
-    const reqData = {
-      title,
-      content,
-      channel,
-      image_type: imageType,
-      image_url: location,
-    };
-    console.log(reqData);
+    formData.title = title;
+    formData.content = content;
+    formData.channel = channel;
+    formData.imageType = imageType;
+    formData.imageUrl = location;
     if (articleId) {
-      editArticleAPI(articleId, reqData);
+      console.log(formData);
+      console.log(articleId);
+      formData.id = articleId;
+      editArticleAPI(formData);
     } else {
-      addArticleAPI(reqData);
+      addArticleAPI(formData);
     }
     notify.success({
       message: "提交成功",
@@ -211,37 +215,30 @@ export function PublishArticle() {
       if (articleId && channelList.length > 0) {
         // 确保channelList已加载
         const res = await getArticleById(articleId.toString());
-        const res_channel = await getChannelById(res.data.data.channel_id);
-        const channel_name = res_channel.data.data.name;
+        console.log(res.data.data);
         if (res.data.data) {
           form.setFieldsValue({
             title: res.data.data.title,
             content: res.data.data.content,
-            channel: channel_name,
-            image_type: res.data.data.image_type,
+            channel: res.data.data.channel,
+            imageType: res.data.data.imageType,
           });
-          setImageType(res.data.data.image_type);
-          if (res.data.data.image_url) {
+          setImageType(res.data.data.imageType);
+          if (res.data.data.imageUrl) {
             // 构建回显 fileList
             const fileList: UploadFile[] = [
               {
                 uid: "-1",
-                name: res.data.data.image_url.split("/").pop() || "image.jpg",
+                name: res.data.data.imageUrl.split("/").pop() || "image.jpg",
                 status: "done",
-                url: `https://${res.data.data.image_url}`,
-                response: { Location: res.data.data.image_url }, // 保持和上传成功一致
+                url: `https://${res.data.data.imageUrl}`,
+                response: { Location: res.data.data.imageUrl }, // 保持和上传成功一致
               },
             ];
             setFileValue(fileList);
           }
-          // 确保channel_name在channelList中存在
-          const channelExists = channelList.some(
-            (c) => c.name === res.data.data.channel_name
-          );
-          if (channelExists) {
-            form.setFieldValue("channel", res.data.data.channel_name);
-          }
           form.setFieldValue("content", res.data.data.content);
+          form.setFieldValue("imageType", res.data.data.imageType);
         }
       }
     }
@@ -287,8 +284,8 @@ export function PublishArticle() {
           <Form.Item name="channel" label="类别" rules={[{ required: true }]}>
             <Select allowClear placeholder="请选择文章类别">
               {channelList.map((channel) => (
-                <Option key={channel.id} value={channel.name}>
-                  {channel.name}
+                <Option key={channel.id} value={channel.channel}>
+                  {channel.channel}
                 </Option>
               ))}
             </Select>
@@ -302,7 +299,7 @@ export function PublishArticle() {
             />
           </Form.Item>
           <Form.Item label="封面">
-            <Form.Item name="image_type">
+            <Form.Item name="imageType">
               <Radio.Group onChange={onImageTypeChange}>
                 <Radio value={1}>单图</Radio>
                 <Radio value={0}>无图</Radio>

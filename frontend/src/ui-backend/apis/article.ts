@@ -1,43 +1,26 @@
 import { request } from "@/ui-backend/utils";
-
-//1. 获取频道列表
-export function getChannelAPI() {
-  //下面是创建请求配置
-  return request({
-    url: "/api/backend/channels",
-    method: "GET",
-  });
-}
+import type { ArticleVOBackend, ArticleVOBackendPage } from "../interface/Article";
 
 //2. 添加文章
-export function addArticleAPI(formData: {
-  title: string;
-  content: string;
-  channel: string;
-  image_type: number;
-  image_url: string;
-}) {
+export function addArticleAPI(formData: ArticleVOBackend) {
   return request({
-    url: "/api/backend/article",
+    url: "/api/backend/article/",
     method: "POST",
-    data: formData,
-  });
-}
-
-//3. 获取文章列表
-//7. 筛选文章
-export function getArticleListAPI( formData: {
-  channel_name: string;
-}) {
-  return request({
-    url: `/api/backend/articlelist`,
-    method: 'PUT',
     data: formData
   });
 }
 
+//3. 获取文章分页列表
+export function getArticleListPageAPI(searchParams: ArticleVOBackendPage) {
+  return request({
+    url: "/api/backend/article/list/page/vo",
+    method: 'POST',
+    data: searchParams
+  });
+}
+
 //4. 后台删除文章
-export function delArticleAPI(id: string) {
+export function deleteArticleByIdAPI(id: number) {
   return request({
     url: `/api/backend/article/${id}`,
     method: "DELETE",
@@ -53,29 +36,11 @@ export function getArticleById(id: string) {
 }
 
 //6. 对id的文章删改（类似添加文章逻辑）
-export function editArticleAPI(
-  id: string,
-  formData: {
-    title: string;
-    content: string;
-    channel: string;
-    image_type: number;
-    image_url: string;
-  }
-) {
+export function editArticleAPI(formData: ArticleVOBackend) {
   return request({
-    url: `/api/backend/article/${id}`,
+    url: "/api/backend/article/",
     method: "PUT",
     data: formData,
   });
 }
 
-//7. 从id中在频道列表中获取相应的频道名字
-export function getChannelById(
-  id: string
-) {
-  return request({
-    url: `/api/backend/channel/${id}`,
-    method: "GET"
-  })
-}

@@ -1,161 +1,120 @@
 package org.example.blogsakura.service.impl;
 
-import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.ObjectMetadata;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.PutObjectResult;
+import cn.hutool.core.util.ObjUtil;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.example.blogsakura.configure.CosClientConfig;
-import org.example.blogsakura.manager.CosManager;
-import org.example.blogsakura.mapper.ArticleMapper;
+import org.apache.commons.lang3.ObjectUtils;
+import org.example.blogsakura.common.exception.BusinessException;
+import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.mapper.ChannelMapper;
-import org.example.blogsakura.pojo.Article;
-import org.example.blogsakura.pojo.ArticleInsert;
-import org.example.blogsakura.pojo.ArticleQuery;
-import org.example.blogsakura.pojo.ArticleUpdate;
+import org.example.blogsakura.model.dto.article.Article;
+import org.example.blogsakura.mapper.ArticleMapper;
+import org.example.blogsakura.model.dto.article.ArticleQueryRequest;
+import org.example.blogsakura.model.dto.channel.Channel;
+import org.example.blogsakura.model.dto.user.UserQueryRequest;
+import org.example.blogsakura.model.vo.article.ArticleVO;
 import org.example.blogsakura.service.ArticleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.blogsakura.service.ChannelService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-@Slf4j
+/**
+ * 文章表 服务层实现。
+ *
+ * @author <a href="https://github.com/liuweixu">liuweixu</a>
+ */
 @Service
-public class ArticleServiceImpl implements ArticleService {
+@Slf4j
+public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
 
     @Resource
-    private ArticleMapper articleMapper;
+    private ChannelService channelService;
+
     @Resource
     private ChannelMapper channelMapper;
-    @Resource
-    private CosClientConfig cosClientConfig;
-
-    @Resource
-    private COSClient cosClient;
-    @Autowired
-    private CosManager cosManager;
 
     /**
-     * 获取文章列表
+     * 分页查询条件
      *
-     * @param articleQuery
+     * @param articleQueryRequest
      * @return
      */
     @Override
-    public List<Article> getArticleList(ArticleQuery articleQuery) {
-        if (articleQuery == null || articleQuery.getChannelName().isEmpty()) {
-            return articleMapper.getArticleList();
+    public QueryWrapper getQueryWrapper(ArticleQueryRequest articleQueryRequest) {
+        if (articleQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+        }
+        Long id = articleQueryRequest.getId();
+        String channelName = articleQueryRequest.getChannel();
+        Channel channel = channelMapper.getChannelByChannelName(channelName);
+        String title = articleQueryRequest.getTitle();
+        String content = articleQueryRequest.getContent();
+        Integer imageType = articleQueryRequest.getImageType();
+        String imageUrl = articleQueryRequest.getImageUrl();
+        LocalDateTime publishDate = articleQueryRequest.getPublishDate();
+        LocalDateTime editDate = articleQueryRequest.getEditDate();
+        Long view = articleQueryRequest.getView();
+        Long like = articleQueryRequest.getLike();
+        String sortField = articleQueryRequest.getSortField();
+        String sortOrder = articleQueryRequest.getSortOrder();
+        if (channel != null) {
+            return QueryWrapper.create()
+                    .eq("id", id)
+                    .eq("channelId", channel.getId())
+                    .eq("imageType", imageType)
+                    .like("content", content)
+                    .like("title", title)
+                    .orderBy(sortField, "ascend".equals(sortOrder));
         } else {
-            return articleMapper.getArticleListByChannel(articleQuery.getChannelName());
+            return QueryWrapper.create()
+                    .eq("id", id)
+                    .eq("title", title)
+                    .eq("imageType", imageType)
+                    .like("content", content)
+                    .orderBy(sortField, "ascend".equals(sortOrder));
         }
     }
 
-
     /**
-     * 首页：获取文章列表
+     * article 文章信息
      *
+     * @param article
      * @return
      */
     @Override
-    public List<Article> getHomeArticleList() {
-        return articleMapper.getArticleList();
-    }
-
-    /**
-     * 按照id删除文章
-     *
-     * @param id
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteArticleById(String id) {
-        articleMapper.deleteArticleById(id);
-    }
-
-    /**
-     * 按照id获取文章
-     *
-     * @param id
-     * @return
-     */
-    @Override
-    public Article getArticleById(String id) {
-        return articleMapper.getArticleById(id);
-    }
-
-    /**
-     * 插入文章
-     *
-     * @param articleInsert
-     * @param id
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void insertArticle(ArticleInsert articleInsert, String id) {
-        Article article = new Article();
-        article.setId(id);
-        String nowTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        article.setPublishDate(nowTime);
-        article.setEditDate(nowTime);
-        article.setTitle(articleInsert.getTitle());
-        article.setContent(articleInsert.getContent());
-        article.setImageUrl(articleInsert.getImageUrl());
-        article.setImageType(articleInsert.getImageType());
-        log.info("channelname:{}", articleInsert.getChannel());
-        Long channelId = channelMapper.getChannelIdByName(articleInsert.getChannel());
-        article.setChannelId(channelId);
-        articleMapper.insertArticle(article);
-    }
-
-    /**
-     * 更新文章
-     *
-     * @param articleUpdate
-     * @param id
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateArticle(ArticleUpdate articleUpdate, String id) {
-        Article article = new Article();
-        article.setId(id);
-        article.setTitle(articleUpdate.getTitle());
-        article.setContent(articleUpdate.getContent());
-        article.setChannelId(channelMapper.getChannelIdByName(articleUpdate.getChannel()));
-        String nowTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        article.setEditDate(nowTime);
-        article.setImageType(articleUpdate.getImageType());
-        article.setImageUrl(articleUpdate.getImageUrl());
-
-        articleMapper.updateArticle(article);
-    }
-
-    /**
-     * 将上传的图片处理，作为一个File类上传到COS中
-     *
-     * @param file
-     * @return
-     */
-    public String uploadImageToCOS(MultipartFile file) {
-        String uuid = UUID.randomUUID().toString();
-        // 生成COS对象键（可以根据需要自定义路径格式）
-        String cosKey = "/images/" + uuid + ".png";
-        try {
-            return cosManager.uploadFileWithoutLocal(file, cosKey);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public ArticleVO getArticleVO(Article article) {
+        if (article == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
+        ArticleVO articleVO = new ArticleVO();
+        BeanUtils.copyProperties(article, articleVO);
+        Long channelId = article.getChannelId();
+        articleVO.setChannel(channelService.getById(channelId).getChannel());
+        articleVO.setId(String.valueOf(article.getId()));
+        return articleVO;
     }
+
+    /**
+     * 返回后端上的文章列表信息
+     *
+     * @param articleList
+     * @return
+     */
+    @Override
+    public List<ArticleVO> getArticleVOList(List<Article> articleList) {
+        if (articleList == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        return articleList.stream().map(this::getArticleVO).collect(Collectors.toList());
+    }
+
+
 }

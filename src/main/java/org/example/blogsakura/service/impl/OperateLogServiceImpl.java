@@ -1,25 +1,17 @@
 package org.example.blogsakura.service.impl;
 
+import com.mybatisflex.spring.service.impl.ServiceImpl;
+import org.example.blogsakura.model.dto.operateLog.OperateLog;
 import org.example.blogsakura.mapper.OperateLogMapper;
-import org.example.blogsakura.pojo.OperateLog;
 import org.example.blogsakura.service.OperateLogService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
+/**
+ * 操作日志表 服务层实现。
+ *
+ * @author <a href="https://github.com/liuweixu">liuweixu</a>
+ */
 @Service
-public class OperateLogServiceImpl implements OperateLogService {
-    @Autowired
-    private OperateLogMapper operateLogMapper;
+public class OperateLogServiceImpl extends ServiceImpl<OperateLogMapper, OperateLog> implements OperateLogService {
 
-    @Override
-    public void deleteOperateLogs() {
-        operateLogMapper.deleteOperateLogs();
-    }
-
-    @Override
-    public List<OperateLog> getOperateLogs() {
-        return operateLogMapper.getOperateLogs();
-    }
 }

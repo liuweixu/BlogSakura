@@ -40,8 +40,8 @@ frontend/*.local
 frontend/*.idea
 frontend/.gitignore
 
-src/main/java/org/example/blogsakura/test
-src/main/java/org/example/blogsakura/test/*
+src/main/java/org/example/blogsakura2/test
+src/main/java/org/example/blogsakura2/test/*
 src/test/java/org/example/blogsakura
 src/test/java/org/example/blogsakura/*
 

@@ -23,12 +23,23 @@ export function LoginPage() {
       <form
         onSubmit={form.handleSubmit(async (fromValue: FieldValues) => {
           //触发异步
-          const res = await loginAPI(fromValue);
-          // console.log(res);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if ((res as any).data.msg == "success") {
+          console.log(fromValue);
+          const res = await loginAPI({
+            userAccount: fromValue.userAccount,
+            userPassword: fromValue.userPassword,
+          });
+          console.log(res.data.message);
+          if (res?.data.message == "ok") {
             navigate("/backend/"); //跳转至首页
             toast.success("登录成功", {
+              description: "Sunday, December 03, 2023 at 9:00 AM",
+              action: {
+                label: "关闭",
+                onClick: () => console.log("Undo"),
+              },
+            });
+          } else {
+            toast.success("登录失败", {
               description: "Sunday, December 03, 2023 at 9:00 AM",
               action: {
                 label: "关闭",
@@ -41,31 +52,41 @@ export function LoginPage() {
         <Card>
           <CardHeader>
             <CardTitle>登录</CardTitle>
-            <CardDescription>请输入手机号和验证码</CardDescription>
+            <CardDescription>请输入账号和密码</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="mobile">手机号</Label>
+                <Label htmlFor="mobile">账号</Label>
                 <Input
-                  id="mobile"
-                  placeholder="请输入您的手机号"
-                  {...form.register("mobile")}
+                  id="userAccount"
+                  placeholder="账号"
+                  {...form.register("userAccount")}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="code">验证码</Label>
+                <Label htmlFor="code">密码</Label>
                 <Input
-                  id="code"
-                  placeholder="请输入验证码"
-                  maxLength={6}
-                  {...form.register("code")}
+                  id="userPassword"
+                  placeholder="请输入密码"
+                  {...form.register("userPassword")}
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="code">再次确认密码</Label>
+                <Input
+                  id="confirmCode"
+                  placeholder="请再次输入密码"
+                  {...form.register("confirmCode")}
                 />
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button type="submit">确认</Button>
+            {/* <Button type="submit" variant="outline">
+              注册
+            </Button> */}
           </CardFooter>
         </Card>
       </form>

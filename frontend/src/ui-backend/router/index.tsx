@@ -9,7 +9,7 @@ const Layout = lazy(() => import("@/ui-backend/pages/Layout"));
 const Home = lazy(() => import("@/ui-backend/pages/Home"));
 const ArticleList = lazy(() => import("@/ui-backend/pages/ArticleList"));
 const Publish = lazy(() => import("@/ui-backend/pages/Publish"));
-const Setting = lazy(() => import("@/ui-backend/pages/Setting"));
+const UserManager = lazy(() => import("@/ui-backend/pages/UserManager"));
 const ChannelList = lazy(() => import("@/ui-backend/pages/Channel"));
 const Logging = lazy(() => import("@/ui-backend/pages/Logging"));
 
@@ -49,7 +49,7 @@ export const RouterBackend = () => {
           }
         />
         <Route
-          path="articlelist"
+          path="article/list"
           element={
             <Suspense fallback={"加载中"}>
               <ArticleList />
@@ -57,15 +57,15 @@ export const RouterBackend = () => {
           }
         />
         <Route
-          path="setting"
+          path="user/list"
           element={
             <Suspense fallback={"加载中"}>
-              <Setting />
+              <UserManager />
             </Suspense>
           }
         />
         <Route
-          path="channellist"
+          path="channel/list"
           element={
             <Suspense fallback={"加载中"}>
               <ChannelList />

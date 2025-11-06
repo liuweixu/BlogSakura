@@ -1,23 +1,18 @@
 package org.example.blogsakura.mapper;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
+import com.mybatisflex.core.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.example.blogsakura.pojo.OperateLog;
+import org.apache.ibatis.annotations.Update;
+import org.example.blogsakura.model.dto.operateLog.OperateLog;
 
-import java.util.List;
-
+/**
+ * 操作日志表 映射层。
+ *
+ * @author <a href="https://github.com/liuweixu">liuweixu</a>
+ */
 @Mapper
-public interface OperateLogMapper {
+public interface OperateLogMapper extends BaseMapper<OperateLog> {
 
-    @Insert("insert into operate_log (id, operate_time, operate_name, cost_time)" +
-            "values (#{id}, #{operateTime}, #{operateName}, #{costTime});")
-    public void insertOperateLog(OperateLog operateLog);
-
-    @Delete("truncate table operate_log")
-    public void deleteOperateLogs();
-
-    @Select("select * from operate_log")
-    public List<OperateLog> getOperateLogs();
+    @Update("update operate_log set isDelete = 1 where isDelete = 0")
+    public boolean deleteOperateAll();
 }

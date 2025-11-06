@@ -1,12 +1,42 @@
 package org.example.blogsakura.service;
 
-import org.example.blogsakura.pojo.Channel;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.service.IService;
+import org.example.blogsakura.model.dto.article.ArticleQueryRequest;
+import org.example.blogsakura.model.dto.channel.Channel;
+import org.example.blogsakura.model.dto.channel.ChannelQueryRequest;
+import org.example.blogsakura.model.vo.channel.ChannelVO;
 
 import java.util.List;
 
-public interface ChannelService {
+/**
+ * 频道表 服务层。
+ *
+ * @author <a href="https://github.com/liuweixu">liuweixu</a>
+ */
+public interface ChannelService extends IService<Channel> {
 
-    public List<Channel> getChannels();
+    /**
+     * 获取供给前端用的频道数据
+     *
+     * @param channel
+     * @return
+     */
+    ChannelVO getChannelVO(Channel channel);
 
-    public Channel getChannelById(String id);
+    /**
+     * 获取供给前端用的频道数据列表
+     *
+     * @param channelList
+     * @return
+     */
+    List<ChannelVO> getChannelVOList(List<Channel> channelList);
+
+    /**
+     * 分页查询条件
+     *
+     * @param channelQueryRequest
+     * @return
+     */
+    QueryWrapper getQueryWrapper(ChannelQueryRequest channelQueryRequest);
 }
