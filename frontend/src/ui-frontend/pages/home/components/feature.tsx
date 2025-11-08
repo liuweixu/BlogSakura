@@ -1,15 +1,15 @@
+import { getFrontendArticleVoListFeatures } from "@/api/articleFrontendController";
 import { Col, Row } from "antd";
-import type { ArticleVOBackend } from "@/ui-backend/interface/Article";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getArticleFeaturesAPI } from "@/ui-frontend/apis/home";
 export function Feature() {
-  const [data, setData] = useState<ArticleVOBackend[]>([]);
+  const [data, setData] = useState<API.ArticleVO[]>([]);
   const getArticleList = async () => {
     try {
-      const res = await getArticleFeaturesAPI();
+      const res = await getFrontendArticleVoListFeatures();
       // 确保data是数组，否则使用空数组
-      setData(res.data.data); // 注意这个，后台上因为添加拦截中，加上res.data，而这个是没加上，所以要多一个data
+      const data = res.data.data ?? [];
+      setData(data); // 注意这个，后台上因为添加拦截中，加上res.data，而这个是没加上，所以要多一个data
     } catch (error) {
       console.error("获取文章列表失败:", error);
     }

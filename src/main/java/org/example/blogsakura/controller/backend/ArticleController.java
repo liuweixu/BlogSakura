@@ -11,6 +11,7 @@ import org.example.blogsakura.common.constants.RabbitMQConstants;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
+import org.example.blogsakura.manager.ArticleBloomFilter;
 import org.example.blogsakura.mapper.ChannelMapper;
 import org.example.blogsakura.model.dto.article.ArticleQueryRequest;
 import org.example.blogsakura.model.dto.channel.Channel;
@@ -45,6 +46,9 @@ public class ArticleController {
     @Resource
     private RabbitTemplate rabbitTemplate;
 
+    @Resource
+    private ArticleBloomFilter articleBloomFilter;
+
     /**
      * 新增文章表。
      *
@@ -61,7 +65,9 @@ public class ArticleController {
         BeanUtils.copyProperties(articleVO, article);
         article.setChannelId(channelId);
         boolean result = articleService.save(article);
+        log.info("result: {}", result);
         if (result) {
+            articleBloomFilter.put(article.getId());
             rabbitTemplate.convertAndSend(RabbitMQConstants.ARTICLE_EXCHANGE,
                     RabbitMQConstants.ARTICLE_INSERT_KEY, article.getId());
         }

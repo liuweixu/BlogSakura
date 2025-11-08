@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Input, List, Spin, Empty } from "antd";
-import { searchArticleDoc } from "@/ui-frontend/apis/article";
 import { useNavigate } from "react-router-dom";
+import { searchArticleByTitleOrContent } from "@/api/esController";
 
 const { Search } = Input;
 
@@ -30,7 +30,7 @@ const SimpleSearch = () => {
     setLoading(true);
     try {
       // 后端为 GET 映射且从 RequestBody 读取 keyword，这里通过 axios 的 data 传递
-      const res = await searchArticleDoc(keyword);
+      const res = await searchArticleByTitleOrContent({ keyword });
       console.log("搜索结果：", res);
       const data = res?.data?.data ?? [];
       // 尽量容错：data 可能是数组或对象

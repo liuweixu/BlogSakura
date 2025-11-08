@@ -18,13 +18,13 @@ const App = () => {
   const getCount = async () => {
     const resArticle = await getArticleVoListByPage({
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 1,
     });
     const articleTotalRow = resArticle?.data.data?.totalRow ?? 0;
     setArticleCount(articleTotalRow);
     const resChannel = await getChannelVoListByPage({
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 1,
     });
     const channelTotalRow = resChannel?.data.data?.totalRow ?? 0;
     setChannelCount(channelTotalRow);

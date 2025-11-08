@@ -48,13 +48,13 @@ export const LoggingPage = () => {
 
   const onClearLog = async () => {
     await deleteOperateLogs();
+    searchParams.currentPage = 1;
     setLogging([]);
   };
 
   const handleTableChange = (page: number, pageSize: number) => {
     searchParams.currentPage = page;
     searchParams.pageSize = pageSize;
-
     getLoggingList();
   };
 

@@ -1,27 +1,26 @@
-import type { ArticleVOBackend } from "@/ui-backend/interface/Article";
-import {
-  getArticleById,
-  updateArticleViewsById,
-} from "@/ui-frontend/apis/article";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { marked } from "marked";
 import "github-markdown-css/github-markdown.css";
 import "./mainwrapper_style.css";
+import { getFrontendArticleVoById } from "@/api/articleFrontendController";
+import { updateViews } from "@/api/viewController";
 
 function App() {
   const location = useLocation();
   const id = location.pathname.split("/")[2];
-  const [data, setData] = useState<ArticleVOBackend>();
+  const [data, setData] = useState<API.ArticleVO>();
   // 计算文章阅读数
   const [view, SetView] = useState(0);
 
   const getArticleContent = async () => {
     try {
-      const res = await getArticleById(id);
+      //
+      const res = await getFrontendArticleVoById({ id: id.toString() });
       setData(res.data.data);
-      const res1 = await updateArticleViewsById(id);
-      SetView(res1?.data.data);
+      const res1 = await updateViews({ id: id.toString() });
+      const viewValue = res1?.data.data ?? 0;
+      SetView(viewValue);
     } catch (error) {
       console.error("获取文章列表失败:", error);
     }

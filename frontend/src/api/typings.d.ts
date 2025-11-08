@@ -17,7 +17,7 @@ declare namespace API {
   };
 
   type ArticleVO = {
-    id?: string;
+    id?: number;
     title?: string;
     content?: string;
     imageType?: number;

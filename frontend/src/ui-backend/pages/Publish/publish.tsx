@@ -211,7 +211,7 @@ export function PublishArticle() {
     async function getArticleDetail() {
       if (articleId && channelList.length > 0) {
         // 确保channelList已加载
-        const res = await getArticleVoById({ id: Number(articleId) });
+        const res = await getArticleVoById({ id: articleId.toString() });
         if (res.data.data) {
           form.setFieldsValue({
             title: res.data.data.title,

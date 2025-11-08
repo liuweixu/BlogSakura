@@ -26,6 +26,7 @@ public class ArticleBloomFilter {
         bloomFilter = BloomFilter.create(Funnels.longFunnel(), 100_000, 0.01);
 
         // 预热布隆过滤器：把所有文章id加入布隆过滤器
+        log.info("预测布隆过滤器");
         List<Long> allArticleIds = fetchAllArticleIdsFromDB();
         for (Long articleId : allArticleIds) {
             log.info(articleId.toString());
@@ -39,5 +40,10 @@ public class ArticleBloomFilter {
 
     private List<Long> fetchAllArticleIdsFromDB() {
         return articleService.list().stream().map(Article::getId).collect(Collectors.toList());
+    }
+
+    public void put(Long articleId) {
+        log.info("更新文章id：{}到布隆过滤器", articleId);
+        bloomFilter.put(articleId);
     }
 }

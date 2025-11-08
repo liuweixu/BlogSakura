@@ -100,7 +100,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         BeanUtils.copyProperties(article, articleVO);
         Long channelId = article.getChannelId();
         articleVO.setChannel(channelService.getById(channelId).getChannel());
-        articleVO.setId(String.valueOf(article.getId()));
+        articleVO.setId(article.getId());
         return articleVO;
     }
 

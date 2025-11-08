@@ -1,9 +1,8 @@
-import type { ArticleVOBackendPage } from "@/ui-backend/interface/Article";
-import { getArticleHomeAPI } from "@/ui-frontend/apis/home";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./list_articles.css";
 import { Pagination } from "antd";
+import { getFrontendArticleVoListByPage } from "@/api/articleFrontendController";
 
 export function ListWrapper() {
   //处理分页信息
@@ -15,9 +14,9 @@ export function ListWrapper() {
   const [total, setTotal] = useState(0);
 
   // 获取文章列表
-  const [data, setData] = useState<ArticleVOBackendPage[]>([]);
+  const [data, setData] = useState<API.ArticleVO[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [searchParams, setSearchParams] = useState<ArticleVOBackendPage>({
+  const [searchParams, setSearchParams] = useState<API.ArticleQueryRequest>({
     currentPage: 1,
     pageSize: 10,
     sortField: "id",
@@ -25,12 +24,13 @@ export function ListWrapper() {
   });
   const getArticleList = async () => {
     try {
-      const res = await getArticleHomeAPI(searchParams);
+      const res = await getFrontendArticleVoListByPage(searchParams);
       // 确保data是数组，否则使用空数组
-      setTotal(res.data.data.totalRow);
+      const records = res.data.data?.records ?? [];
+      const totalRow = res.data.data?.totalRow ?? 0;
+      setTotal(totalRow);
       // 注意这个，后台上因为添加拦截中，加上res.data，而这个是没加上，所以要多一个data
-      setData(res.data.data.records);
-      console.log(res.data.data.records);
+      setData(records);
     } catch (error) {
       console.error("获取文章列表失败:", error);
     }
