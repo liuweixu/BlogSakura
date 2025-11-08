@@ -54,7 +54,7 @@ public class ArticleFrontendController {
      * @return 分页对象
      */
     @PostMapping("list/page/vo")
-    public BaseResponse<Page<ArticleVO>> getArticleVOListByPage(@RequestBody ArticleQueryRequest articleQueryRequest) {
+    public BaseResponse<Page<ArticleVO>> getFrontendArticleVOListByPage(@RequestBody ArticleQueryRequest articleQueryRequest) {
         ThrowUtils.throwIf(articleQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long currentPage = articleQueryRequest.getCurrentPage();
         long pageSize = articleQueryRequest.getPageSize();

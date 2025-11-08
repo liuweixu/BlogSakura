@@ -16,21 +16,22 @@ import {
   Input,
 } from "antd";
 import { useEffect, useState } from "react";
-import { deleteArticleByIdAPI } from "@/ui-backend/apis/article";
 
 import { Table } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
-import { getArticleListPageAPI } from "@/ui-backend/apis/article";
-import type { ArticleVOBackendPage } from "@/ui-backend/interface/Article";
+import {
+  getArticleVoListByPage,
+  removeArticleById,
+} from "@/api/articleController";
 
 export const Article = () => {
   const navigate = useNavigate();
 
   //获取文章列表
-  const [articleList, setArticleList] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [searchParams, setSearchParams] = useState<ArticleVOBackendPage>({
+  const [articleList, setArticleList] = useState<API.ArticleVO[]>([]);
+  const [total, setTotal] = useState<number>(0);
+  const [searchParams, setSearchParams] = useState<API.ArticleQueryRequest>({
     currentPage: 1,
     pageSize: 5,
     sortField: "id",
@@ -39,10 +40,13 @@ export const Article = () => {
   const [form] = Form.useForm();
   form.setFieldsValue(searchParams);
   const getArticleList = async () => {
-    const res = await getArticleListPageAPI(searchParams);
-    setArticleList(res.data.data.records);
-    console.log(res.data.data.records);
-    setTotal(res.data.data.totalRow);
+    const res = await getArticleVoListByPage(
+      searchParams as API.ArticleQueryRequest
+    );
+    const records = res?.data?.data?.records ?? [];
+    const totalRow = res.data.data?.totalRow ?? 0;
+    setArticleList(records);
+    setTotal(totalRow);
   };
   useEffect(() => {
     getArticleList();
@@ -50,16 +54,17 @@ export const Article = () => {
 
   // 删除文章(删除后要更新文章列表)
   const handleDelete = async (id: number) => {
-    const res = await deleteArticleByIdAPI(id);
+    const res = await removeArticleById({ id });
     if (res.data.code === 0) {
       message.success("删除成功");
       // 检查删除后当前页是否为空
       const currentPageItemCount = articleList.length;
+      const currentPage = searchParams.currentPage ?? 1;
       // 如果当前页只有一条数据（删除后为空），且不是第一页，则跳转到前一页
-      if (currentPageItemCount === 1 && searchParams.currentPage > 1) {
+      if (currentPageItemCount === 1 && currentPage > 1) {
         setSearchParams({
           ...searchParams,
-          currentPage: searchParams.currentPage - 1,
+          currentPage: currentPage - 1,
         });
       } else {
         // 否则直接刷新当前页

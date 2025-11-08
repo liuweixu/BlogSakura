@@ -1,3 +1,5 @@
+import { healthCheck } from "@/api/healthController";
+import { loginUser } from "@/api/userController";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +12,6 @@ import {
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { loginAPI } from "@/ui-backend/apis/user";
 import { useForm, type FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,13 +19,22 @@ import { toast } from "sonner";
 export function LoginPage() {
   const form = useForm();
   const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  healthCheck().then((res: any) => {
+    console.log("healthCheck");
+    console.log(res);
+  });
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(async (fromValue: FieldValues) => {
           //触发异步
           console.log(fromValue);
-          const res = await loginAPI({
+          // const res = await loginAPI({
+          //   userAccount: fromValue.userAccount,
+          //   userPassword: fromValue.userPassword,
+          // });
+          const res = await loginUser({
             userAccount: fromValue.userAccount,
             userPassword: fromValue.userPassword,
           });

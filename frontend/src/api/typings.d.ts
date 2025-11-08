@@ -1,0 +1,355 @@
+declare namespace API {
+  type ArticleQueryRequest = {
+    currentPage?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    title?: string;
+    content?: string;
+    channel?: string;
+    imageType?: number;
+    imageUrl?: string;
+    publishDate?: string;
+    editDate?: string;
+    view?: number;
+    like?: number;
+  };
+
+  type ArticleVO = {
+    id?: string;
+    title?: string;
+    content?: string;
+    imageType?: number;
+    imageUrl?: string;
+    publishDate?: string;
+    editDate?: string;
+    view?: number;
+    like?: number;
+    channel?: string;
+  };
+
+  type BaseResponseArticleVO = {
+    code?: number;
+    data?: ArticleVO;
+    message?: string;
+  };
+
+  type BaseResponseBoolean = {
+    code?: number;
+    data?: boolean;
+    message?: string;
+  };
+
+  type BaseResponseChannelVO = {
+    code?: number;
+    data?: ChannelVO;
+    message?: string;
+  };
+
+  type BaseResponseListArticleVO = {
+    code?: number;
+    data?: ArticleVO[];
+    message?: string;
+  };
+
+  type BaseResponseListChannelVO = {
+    code?: number;
+    data?: ChannelVO[];
+    message?: string;
+  };
+
+  type BaseResponseListOperateLog = {
+    code?: number;
+    data?: OperateLog[];
+    message?: string;
+  };
+
+  type BaseResponseLoginUserVO = {
+    code?: number;
+    data?: LoginUserVO;
+    message?: string;
+  };
+
+  type BaseResponseLong = {
+    code?: number;
+    data?: number;
+    message?: string;
+  };
+
+  type BaseResponseOperateLog = {
+    code?: number;
+    data?: OperateLog;
+    message?: string;
+  };
+
+  type BaseResponsePageArticleVO = {
+    code?: number;
+    data?: PageArticleVO;
+    message?: string;
+  };
+
+  type BaseResponsePageChannelVO = {
+    code?: number;
+    data?: PageChannelVO;
+    message?: string;
+  };
+
+  type BaseResponsePageOperateLog = {
+    code?: number;
+    data?: PageOperateLog;
+    message?: string;
+  };
+
+  type BaseResponsePageUserVO = {
+    code?: number;
+    data?: PageUserVO;
+    message?: string;
+  };
+
+  type BaseResponseString = {
+    code?: number;
+    data?: string;
+    message?: string;
+  };
+
+  type BaseResponseUser = {
+    code?: number;
+    data?: User;
+    message?: string;
+  };
+
+  type BaseResponseUserVO = {
+    code?: number;
+    data?: UserVO;
+    message?: string;
+  };
+
+  type Channel = {
+    id?: number;
+    channel?: string;
+    isDelete?: number;
+    createTime?: string;
+    updateTime?: string;
+  };
+
+  type ChannelQueryRequest = {
+    currentPage?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    channel?: string;
+    createTime?: string;
+    updateTime?: string;
+  };
+
+  type ChannelVO = {
+    id?: number;
+    channel?: string;
+    createTime?: string;
+    updateTime?: string;
+    articleNumbers?: number;
+  };
+
+  type getArticleVOByIdParams = {
+    id: number;
+  };
+
+  type getChannelVOByIdParams = {
+    id: number;
+  };
+
+  type getFrontendArticleVOByIdParams = {
+    id: number;
+  };
+
+  type getInfoParams = {
+    id: number;
+  };
+
+  type getOperateLogByIdParams = {
+    id: number;
+  };
+
+  type getUserByIdParams = {
+    id: number;
+  };
+
+  type getUserVOByIdParams = {
+    id: number;
+  };
+
+  type LoginUserVO = {
+    id?: number;
+    userAccount?: string;
+    userName?: string;
+    userRole?: string;
+    createTime?: string;
+    updateTime?: string;
+  };
+
+  type OperateLog = {
+    id?: number;
+    operateTime?: string;
+    operateName?: string;
+    costTime?: number;
+    isDelete?: number;
+  };
+
+  type OperateLogQueryRequest = {
+    currentPage?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    operateTime?: string;
+    operateName?: string;
+    costTime?: number;
+  };
+
+  type PageArticleVO = {
+    records?: ArticleVO[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalPage?: number;
+    totalRow?: number;
+    optimizeCountQuery?: boolean;
+  };
+
+  type PageChannelVO = {
+    records?: ChannelVO[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalPage?: number;
+    totalRow?: number;
+    optimizeCountQuery?: boolean;
+  };
+
+  type PageOperateLog = {
+    records?: OperateLog[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalPage?: number;
+    totalRow?: number;
+    optimizeCountQuery?: boolean;
+  };
+
+  type pageParams = {
+    page: PagePicture;
+  };
+
+  type PagePicture = {
+    records?: Picture[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalPage?: number;
+    totalRow?: number;
+    optimizeCountQuery?: boolean;
+  };
+
+  type PageUserVO = {
+    records?: UserVO[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalPage?: number;
+    totalRow?: number;
+    optimizeCountQuery?: boolean;
+  };
+
+  type Picture = {
+    id?: number;
+    url?: string;
+    name?: string;
+    introduction?: string;
+    category?: string;
+    tags?: string;
+    picSize?: number;
+    picWidth?: number;
+    picHeight?: number;
+    picScale?: number;
+    picFormat?: string;
+    userId?: number;
+    createTime?: string;
+    editTime?: string;
+    updateTime?: string;
+    isDelete?: number;
+  };
+
+  type removeArticleByIdParams = {
+    id: number;
+  };
+
+  type removeChannelByIdParams = {
+    id: number;
+  };
+
+  type removeOperateLogByIdParams = {
+    id: number;
+  };
+
+  type removeParams = {
+    id: number;
+  };
+
+  type removeUserByIdParams = {
+    id: number;
+  };
+
+  type updateViewsParams = {
+    id: number;
+  };
+
+  type User = {
+    id?: number;
+    userAccount?: string;
+    userPassword?: string;
+    userName?: string;
+    userRole?: string;
+    createTime?: string;
+    updateTime?: string;
+    isDelete?: number;
+  };
+
+  type UserAddRequest = {
+    userName?: string;
+    userAccount?: string;
+    userRole?: string;
+  };
+
+  type UserLoginRequest = {
+    userAccount?: string;
+    userPassword?: string;
+  };
+
+  type UserQueryRequest = {
+    currentPage?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    userName?: string;
+    userAccount?: string;
+    userRole?: string;
+  };
+
+  type UserRegisterRequest = {
+    userAccount?: string;
+    userPassword?: string;
+    checkPassword?: string;
+  };
+
+  type UserUpdateRequest = {
+    id?: number;
+    userName?: string;
+    userRole?: string;
+  };
+
+  type UserVO = {
+    id?: number;
+    userAccount?: string;
+    userName?: string;
+    userRole?: string;
+    createTime?: string;
+  };
+}

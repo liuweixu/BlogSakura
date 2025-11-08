@@ -2,7 +2,7 @@ import axios from "axios";
 
 // 创建 axios 实例
 const request = axios.create({
-  baseURL: "/", // 根据你的后端地址修改
+  baseURL: "/api", // 根据你的后端地址修改
   timeout: 5000,
   withCredentials: true
 });
@@ -34,4 +34,4 @@ request.interceptors.response.use(
   }
 );
 
-export { request };
+export default request;

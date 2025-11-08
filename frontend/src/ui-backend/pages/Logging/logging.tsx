@@ -1,5 +1,7 @@
-import { deleteLoggingAPI, getLoggingPageAPI } from "@/ui-backend/apis/logging";
-import type { LoggingVOBackendPage } from "@/ui-backend/interface/Logging";
+import {
+  deleteOperateLogs,
+  getOperateLogListByPage,
+} from "@/api/operateLogController";
 import { Breadcrumb, Button, Card } from "antd";
 
 import { Table } from "antd";
@@ -7,17 +9,20 @@ import { useEffect, useState } from "react";
 
 export const LoggingPage = () => {
   // 获取日志记录信息
-  const [logging, setLogging] = useState([]);
+  const [logging, setLogging] = useState<API.OperateLog[]>([]);
   const [total, setTotal] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [searchParams, setSearchParams] = useState<LoggingVOBackendPage>({
+  const [searchParams, setSearchParams] = useState<API.OperateLogQueryRequest>({
     currentPage: 1,
     pageSize: 10,
   });
+  // 修改以适应 getOperateLogListByPage 需要的参数格式
   const getLoggingList = async () => {
-    const resLogging = await getLoggingPageAPI(searchParams);
-    setLogging(resLogging?.data.data.records);
-    setTotal(resLogging?.data.data.totalRow);
+    const resLogging = await getOperateLogListByPage(searchParams);
+    const records = resLogging?.data?.data?.records ?? [];
+    const totalRow = resLogging?.data?.data?.totalRow ?? 0;
+    setLogging(records);
+    setTotal(totalRow);
   };
   useEffect(() => {
     getLoggingList();
@@ -42,7 +47,7 @@ export const LoggingPage = () => {
   ];
 
   const onClearLog = async () => {
-    await deleteLoggingAPI();
+    await deleteOperateLogs();
     setLogging([]);
   };
 

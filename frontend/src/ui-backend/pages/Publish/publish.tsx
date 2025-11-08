@@ -12,13 +12,6 @@
 
 // import RichTextEditor from "@/ui-backend/components/Editor";
 import { useEffect, useState } from "react";
-import {
-  getArticleById,
-  // getChannelAPI,
-  addArticleAPI,
-  editArticleAPI,
-  // getChannelById,
-} from "@/ui-backend/apis/article";
 
 import { useSearchParams } from "react-router-dom";
 
@@ -37,10 +30,13 @@ import ReactQuill from "react-quill-new";
 import "./index.css";
 import { Upload, notification } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { uploadAPI } from "@/ui-backend/apis/upload";
-import type { ArticleVOBackend } from "@/ui-backend/interface/Article";
-import { getChannelListAPI } from "@/ui-backend/apis/channel";
-import type { ChannelVOBackend } from "@/ui-backend/interface/Channel";
+import { getChannelVOlist } from "@/api/channelController";
+import {
+  addArticle,
+  getArticleVoById,
+  getUploadFile,
+  updateArticle,
+} from "@/api/articleController";
 
 const { Option } = Select;
 
@@ -59,12 +55,15 @@ export function PublishArticle() {
   const [imageType, setImageType] = useState<number>(0);
   const [location, setLocation] = useState<string>("");
 
-  const [channelList, setChannelList] = useState<ChannelVOBackend[]>([]);
+  const [channelList, setChannelList] = useState<API.ChannelVO[]>([]);
+
+  const getChannelList = async () => {
+    const res = await getChannelVOlist();
+    const data = res?.data?.data ?? [];
+    setChannelList(data);
+  };
+
   useEffect(() => {
-    const getChannelList = async () => {
-      const res = await getChannelListAPI();
-      setChannelList(res.data.data);
-    };
     getChannelList();
   }, []);
 
@@ -78,7 +77,7 @@ export function PublishArticle() {
   //提交成功提示
   const [notify, contextHolder] = notification.useNotification();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [formData, setFormData] = useState<ArticleVOBackend>({});
+  const [formData, setFormData] = useState<API.ArticleVO>({});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFinish = (values: any) => {
     const { title, channel, content } = values;
@@ -88,12 +87,10 @@ export function PublishArticle() {
     formData.imageType = imageType;
     formData.imageUrl = location;
     if (articleId) {
-      console.log(formData);
-      console.log(articleId);
       formData.id = articleId;
-      editArticleAPI(formData);
+      updateArticle(formData);
     } else {
-      addArticleAPI(formData);
+      addArticle(formData);
     }
     notify.success({
       message: "提交成功",
@@ -134,11 +131,11 @@ export function PublishArticle() {
       // 调用上传 API
       const formData = new FormData();
       formData.append("image", file);
-      const response = await uploadAPI(formData);
+      const response = await getUploadFile(formData);
 
       // 根据后端返回的数据结构调整
       // 假设后端返回格式为 { data: { Location: "xxx" } }
-      const href = response.data?.data;
+      const href = response?.data?.data ?? "";
       setLocation(href);
 
       // 更新文件列表，添加响应信息
@@ -214,8 +211,7 @@ export function PublishArticle() {
     async function getArticleDetail() {
       if (articleId && channelList.length > 0) {
         // 确保channelList已加载
-        const res = await getArticleById(articleId.toString());
-        console.log(res.data.data);
+        const res = await getArticleVoById({ id: Number(articleId) });
         if (res.data.data) {
           form.setFieldsValue({
             title: res.data.data.title,
@@ -223,7 +219,8 @@ export function PublishArticle() {
             channel: res.data.data.channel,
             imageType: res.data.data.imageType,
           });
-          setImageType(res.data.data.imageType);
+          const imageTypeValue = res.data.data.imageType ?? 0;
+          setImageType(imageTypeValue);
           if (res.data.data.imageUrl) {
             // 构建回显 fileList
             const fileList: UploadFile[] = [
@@ -237,7 +234,7 @@ export function PublishArticle() {
             ];
             setFileValue(fileList);
           }
-          console.log(res.data.data.imageUrl);
+          // console.log(res.data.data.imageUrl);
           form.setFieldValue("imageUrl", res.data.data.imageUrl);
         }
       }

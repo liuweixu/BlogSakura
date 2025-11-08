@@ -4,8 +4,8 @@ import CountUp from "react-countup";
 import { Col, Row, Statistic } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getArticleListPageAPI } from "@/ui-backend/apis/article";
-import { getChannelListPageAPI } from "@/ui-backend/apis/channel";
+import { getChannelVoListByPage } from "@/api/channelController";
+import { getArticleVoListByPage } from "@/api/articleController";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const formatter = (value: any) => <CountUp end={value} separator="," />;
@@ -16,16 +16,18 @@ const App = () => {
   const [channelCount, setChannelCount] = useState(0);
   const navigate = useNavigate();
   const getCount = async () => {
-    const resArticle = await getArticleListPageAPI({
+    const resArticle = await getArticleVoListByPage({
       currentPage: 1,
       pageSize: 10,
     });
-    setArticleCount(resArticle?.data.data.totalRow);
-    const resChannel = await getChannelListPageAPI({
+    const articleTotalRow = resArticle?.data.data?.totalRow ?? 0;
+    setArticleCount(articleTotalRow);
+    const resChannel = await getChannelVoListByPage({
       currentPage: 1,
       pageSize: 10,
     });
-    setChannelCount(resChannel?.data.data.totalRow);
+    const channelTotalRow = resChannel?.data.data?.totalRow ?? 0;
+    setChannelCount(channelTotalRow);
   };
   useEffect(() => {
     getCount();

@@ -19,12 +19,12 @@ public class ESController {
 
 
 //    @PostMapping("/search/title")
-//    public BaseResponse<List<ArticleVO>> findArticleByTitle(@RequestBody Map<String, Object> data) {
+//    public BaseResponse<List<ArticleVO>> searchArticleByTitle(@RequestBody Map<String, Object> data) {
 //        return ResultUtils.success(esService.searchArticleVOByTitle(data.get("keyword").toString()));
 //    }
 
     @PostMapping("/search")
-    public BaseResponse<List<ArticleVO>> findArticleByTitleOrContent(@RequestBody Map<String, Object> data) {
+    public BaseResponse<List<ArticleVO>> searchArticleByTitleOrContent(@RequestBody Map<String, Object> data) {
         return ResultUtils.success(esService.searchArticleOrContentVOByTitle(data.get("keyword").toString()));
     }
 }

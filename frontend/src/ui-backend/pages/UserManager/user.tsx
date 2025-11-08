@@ -1,29 +1,10 @@
 import { useEffect, useState } from "react";
 import { Button, Form, Input, message, Space, Table } from "antd";
 import type { TableProps } from "antd";
-import { deleteUserByIdAPI, getUserListAPI } from "@/ui-backend/apis/user";
-
-interface UserVOType {
-  id: number;
-  userAccount: string;
-  userName: string;
-  userRole: string;
-  createTime: Date;
-}
-
-export interface UserQueryRequest {
-  currentPage: number;
-  pageSize: number;
-  sortField?: string;
-  sortOrder?: string;
-  id?: number;
-  userName?: string;
-  userAccount?: string;
-  userRole?: string;
-}
+import { listUserVoByPage, removeUserById } from "@/api/userController";
 
 export const User = () => {
-  const columns: TableProps<UserVOType>["columns"] = [
+  const columns: TableProps<API.UserVO>["columns"] = [
     {
       title: "id",
       dataIndex: "id",
@@ -58,7 +39,11 @@ export const User = () => {
       dataIndex: "operation",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" danger onClick={() => handleDelete(record.id)}>
+          <Button
+            type="primary"
+            danger
+            onClick={() => handleDelete(record.id ?? 0)}
+          >
             删除
           </Button>
           <Button type="primary">修改</Button>
@@ -67,9 +52,9 @@ export const User = () => {
     },
   ];
 
-  const [userList, setUserList] = useState<UserVOType[]>([]);
+  const [userList, setUserList] = useState<API.UserVO[]>([]);
   const [total, setTotal] = useState(0);
-  const [searchParams, setSearchParams] = useState<UserQueryRequest>({
+  const [searchParams, setSearchParams] = useState<API.UserQueryRequest>({
     currentPage: 1,
     pageSize: 5,
   });
@@ -77,23 +62,25 @@ export const User = () => {
   form.setFieldsValue(searchParams);
 
   const getUserList = async () => {
-    const resUserList = await getUserListAPI(searchParams);
-    setUserList(resUserList?.data.data.records);
-    const newTotal = resUserList?.data.data.totalRow;
+    const resUserList = await listUserVoByPage(searchParams);
+    const records = resUserList?.data?.data?.records ?? [];
+    setUserList(records);
+    const newTotal = resUserList?.data?.data?.totalRow ?? 0;
     setTotal(newTotal);
   };
 
   const handleDelete = async (id: number) => {
-    const res = await deleteUserByIdAPI(id);
+    const res = await removeUserById({ id });
     if (res.data.code === 0) {
       message.success("删除成功");
       // 检查删除后当前页是否为空
       const currentPageItemCount = userList.length;
       // 如果当前页只有一条数据（删除后为空），且不是第一页，则跳转到前一页
-      if (currentPageItemCount === 1 && searchParams.currentPage > 1) {
+      const currentPage = searchParams.currentPage ?? 1;
+      if (currentPageItemCount === 1 && currentPage > 1) {
         setSearchParams({
           ...searchParams,
-          currentPage: searchParams.currentPage - 1,
+          currentPage: currentPage - 1,
         });
       } else {
         // 否则直接刷新当前页
@@ -139,7 +126,7 @@ export const User = () => {
           </Button>
         </div>
       </Form>
-      <Table<UserVOType>
+      <Table<API.UserVO>
         className="mt-5"
         columns={columns}
         dataSource={userList}

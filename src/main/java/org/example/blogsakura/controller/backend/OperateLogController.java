@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.ResultUtils;
+import org.example.blogsakura.common.exception.ErrorCode;
+import org.example.blogsakura.common.exception.ThrowUtils;
 import org.example.blogsakura.mapper.OperateLogMapper;
+import org.example.blogsakura.model.dto.operateLog.OperateLogQueryRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,12 +98,18 @@ public class OperateLogController {
     /**
      * 分页查询操作日志表。
      *
-     * @param page 分页对象
+     * @param operateLogQueryRequest 分页请求
      * @return 分页对象
      */
-    @GetMapping("list/page/vo")
-    public BaseResponse<Page<OperateLog>> getOperateLogListByPage(Page<OperateLog> page) {
-        return ResultUtils.success(operateLogService.page(page));
+    @PostMapping("list/page/vo")
+    public BaseResponse<Page<OperateLog>> getOperateLogListByPage(@RequestBody OperateLogQueryRequest operateLogQueryRequest) {
+        ThrowUtils.throwIf(operateLogQueryRequest == null, ErrorCode.PARAMS_ERROR);
+        long currentPage = operateLogQueryRequest.getCurrentPage();
+        long pageSize = operateLogQueryRequest.getPageSize();
+        Page<OperateLog> operateLogPage = operateLogService.page(
+                Page.of(currentPage, pageSize)
+        );
+        return ResultUtils.success(operateLogPage);
     }
 
     /**

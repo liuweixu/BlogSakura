@@ -1,25 +1,27 @@
 import { Breadcrumb, Card } from "antd";
 import { useEffect, useState } from "react";
-import { getChannelListPageAPI } from "@/ui-backend/apis/channel";
-import type { ChannelVOBackendPage } from "@/ui-backend/interface/Channel";
 
 import { Table } from "antd";
+import { getChannelVoListByPage } from "@/api/channelController";
 
 export const Channel = () => {
   //获取频道信息
-  const [channelList, setChannelList] = useState<ChannelVOBackendPage[]>([]);
-  const [searchParams, setSearchParams] = useState<ChannelVOBackendPage>({
+  const [channelList, setChannelList] = useState<API.ChannelVO[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [searchParams, setSearchParams] = useState<API.ChannelQueryRequest>({
     currentPage: 1,
     pageSize: 10,
   });
   const [total, setTotal] = useState(0);
 
   const getChannelList = async () => {
-    const res_channel = await getChannelListPageAPI(searchParams);
-    console.log(res_channel.data.data.records);
-    setChannelList(res_channel.data.data.records);
-    const total = res_channel.data.data.totalRow;
-    setTotal(total);
+    const res_channel = await getChannelVoListByPage(
+      searchParams as API.ChannelQueryRequest
+    );
+    const records = res_channel?.data?.data?.records ?? [];
+    setChannelList(records);
+    const totalRow = res_channel?.data?.data?.totalRow ?? 0;
+    setTotal(totalRow);
   };
   useEffect(() => {
     getChannelList();

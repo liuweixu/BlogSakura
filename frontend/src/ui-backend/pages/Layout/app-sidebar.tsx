@@ -9,14 +9,14 @@ import {
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Popconfirm, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { getUserInfoAPI, isLoginAPI, logoutAPI } from "@/ui-backend/apis/user";
-import type { UserVOBackend } from "@/ui-backend/interface/User";
+import { loginUserSession, logoutUser } from "@/api/userController";
 const { Header, Sider, Content } = Layout;
 
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
-  const [userInfo, setUserInfo] = useState<UserVOBackend>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [userInfo, setUserInfo] = useState<API.UserVO>();
   //路由跳转
   const navigate = useNavigate();
   //高亮
@@ -30,7 +30,7 @@ const App: React.FC = () => {
 
   // 实现退出逻辑
   const onLogout = async () => {
-    const res = await logoutAPI();
+    const res = await logoutUser();
     setIsLogin(false);
     if (res?.data.message == "ok") {
       navigate("/backend/login");
@@ -39,16 +39,16 @@ const App: React.FC = () => {
 
   //处理未登录时，同样后端界面的情况
   const getIsLogin = async () => {
-    const res = await isLoginAPI();
+    const res = await loginUserSession();
     setIsLogin(res?.data.message !== "未登录");
   };
-  const getUserInfo = async () => {
-    const res = await getUserInfoAPI();
-    setUserInfo(res?.data.data);
-  };
+  // const getUserInfo = async () => {
+  //   const res = await getUserInfoAPI();
+  //   setUserInfo(res?.data.data);
+  // };
   useEffect(() => {
     getIsLogin();
-    getUserInfo();
+    // getUserInfo();
   }, []);
   return (
     <>
