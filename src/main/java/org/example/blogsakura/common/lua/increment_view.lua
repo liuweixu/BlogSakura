@@ -8,12 +8,7 @@ local defaultValue = tonumber(ARGV[1])
 local expireSeconds = tonumber(ARGV[2])
 
 local value = redis.call("GET", key)
-if not value then
-    redis.call("SET", key, defaultValue, "EX", expireSeconds)
-    return defaultValue
-else
-    local num = tonumber(value)
-    num = num + 1
-    redis.call("SET", key, num)
-    return num
-end
+-- Redis不存在，设置初始值为defaultValue，并设置过期时间ttl
+local num = defaultValue + 1
+redis.call("SET", key, num, "EX", expireSeconds)
+return num

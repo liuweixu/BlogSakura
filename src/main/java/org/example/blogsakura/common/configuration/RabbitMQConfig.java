@@ -20,7 +20,7 @@ public class RabbitMQConfig {
     }
 
     /**
-     * MySQL与ES之间的异步消息传递
+     * 创建队列，MySQL与ES之间的异步消息传递
      *
      * @return
      */
@@ -36,7 +36,7 @@ public class RabbitMQConfig {
 
 
     /**
-     * MySQL与ES之间的异步传递
+     * 绑定队列到交换机，MySQL与ES之间的异步传递
      *
      * @return
      */

@@ -79,6 +79,4 @@ public class ChannelServiceImpl extends ServiceImpl<ChannelMapper, Channel> impl
                 .like("channel", channel)
                 .orderBy(sortField, "ascend".equals(sortOrder));
     }
-
-
 }

@@ -1,10 +1,10 @@
-package org.example.blogsakura.mapper;
+package org.example.blogsakura.manager;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.constants.RabbitMQConstants;
-import org.example.blogsakura2.mapper.ArticleMapper;
-import org.example.blogsakura2.service.ESService;
+import org.example.blogsakura.mapper.ArticleMapper;
+import org.example.blogsakura.service.ESService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,8 +28,8 @@ public class RabbitMQListener {
      * @param id
      */
     @RabbitListener(queues = RabbitMQConstants.ARTICLE_INSERT_QUEUE)
-    public void listenArticleInsertOrUpdate(String id) {
-        esService.insertArticleDocById(id);
+    public void listenArticleInsertOrUpdate(Long id) {
+        esService.addArticleVOToESById(id);
     }
 
     /**
@@ -38,8 +38,8 @@ public class RabbitMQListener {
      * @param id
      */
     @RabbitListener(queues = RabbitMQConstants.ARTICLE_DELETE_QUEUE)
-    public void listenArticleDelete(String id) {
-        esService.deleteArticleDocById(id);
+    public void listenArticleDelete(Long id) {
+        esService.deleteArticleVOFromESById(id);
     }
 
     /**
@@ -49,12 +49,12 @@ public class RabbitMQListener {
      */
     @RabbitListener(queues = RabbitMQConstants.VIEW_UPDATE_QUEUE)
     @Transactional(rollbackFor = Exception.class)
-    public void listenViewUpdate(String id) {
+    public void listenViewUpdate(Long id) {
         try {
-            String value = stringRedisTemplate.opsForValue().get(id);
+            String value = stringRedisTemplate.opsForValue().get(String.valueOf(id));
             if (value == null) return;
 
-            Long count = Long.valueOf(value);
+            long count = Long.parseLong(value);
             articleMapper.updateViewById(id, count);
         } catch (Exception e) {
             log.error("Failed to update view for {}", id, e);

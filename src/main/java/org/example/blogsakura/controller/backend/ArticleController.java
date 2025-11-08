@@ -2,9 +2,11 @@ package org.example.blogsakura.controller.backend;
 
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.ResultUtils;
+import org.example.blogsakura.common.constants.RabbitMQConstants;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
@@ -13,18 +15,13 @@ import org.example.blogsakura.model.dto.article.ArticleQueryRequest;
 import org.example.blogsakura.model.dto.channel.Channel;
 import org.example.blogsakura.model.vo.article.ArticleVO;
 import org.example.blogsakura.service.ChannelService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.example.blogsakura.model.dto.article.Article;
 import org.example.blogsakura.service.ArticleService;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -44,8 +41,11 @@ public class ArticleController {
     @Resource
     private ChannelMapper channelMapper;
 
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+
     /**
-     * 保存文章表。
+     * 新增文章表。
      *
      * @param articleVO 前端返回的文章表
      * @return {@code true} 保存成功，{@code false} 保存失败
@@ -58,7 +58,12 @@ public class ArticleController {
         Article article = new Article();
         BeanUtils.copyProperties(articleVO, article);
         article.setChannelId(channelId);
-        return ResultUtils.success(articleService.save(article));
+        boolean result = articleService.save(article);
+        if (result) {
+            rabbitTemplate.convertAndSend(RabbitMQConstants.ARTICLE_EXCHANGE,
+                    RabbitMQConstants.ARTICLE_INSERT_KEY, article.getId());
+        }
+        return ResultUtils.success(result);
     }
 
     /**
@@ -69,7 +74,12 @@ public class ArticleController {
      */
     @DeleteMapping("/{id}")
     public BaseResponse<Boolean> removeArticleById(@PathVariable Long id) {
-        return ResultUtils.success(articleService.removeById(id));
+        boolean result = articleService.removeById(id);
+        if (result) {
+            rabbitTemplate.convertAndSend(RabbitMQConstants.ARTICLE_EXCHANGE,
+                    RabbitMQConstants.ARTICLE_DELETE_KEY, id);
+        }
+        return ResultUtils.success(result);
     }
 
     /**
@@ -86,7 +96,12 @@ public class ArticleController {
         BeanUtils.copyProperties(articleVO, article);
         article.setChannelId(channelId);
         article.setId(Long.valueOf(articleVO.getId()));
-        return ResultUtils.success(articleService.updateById(article));
+        boolean result = articleService.updateById(article);
+        if (result) {
+            rabbitTemplate.convertAndSend(RabbitMQConstants.ARTICLE_EXCHANGE,
+                    RabbitMQConstants.ARTICLE_INSERT_KEY, article.getId());
+        }
+        return ResultUtils.success(result);
     }
 
     /**
@@ -130,6 +145,12 @@ public class ArticleController {
         List<ArticleVO> articleVOList = articleService.getArticleVOList(articlePage.getRecords());
         articleVOPage.setRecords(articleVOList);
         return ResultUtils.success(articleVOPage);
+    }
+
+    @PostMapping("/upload/image")
+    public BaseResponse<String> getUploadFile(@RequestPart("image") MultipartFile file) {
+        // 获取文件名
+        return ResultUtils.success(articleService.uploadImageToCOS(file));
     }
 
 }

@@ -6,6 +6,7 @@ import org.example.blogsakura.model.dto.article.Article;
 import org.example.blogsakura.model.dto.article.ArticleQueryRequest;
 import org.example.blogsakura.model.dto.user.UserQueryRequest;
 import org.example.blogsakura.model.vo.article.ArticleVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -39,4 +40,13 @@ public interface ArticleService extends IService<Article> {
      * @return
      */
     List<ArticleVO> getArticleVOList(List<Article> articleList);
+
+
+    /**
+     * 将上传的图片处理，作为一个File类上传到COS中
+     *
+     * @param file
+     * @return
+     */
+    public String uploadImageToCOS(MultipartFile file);
 }

@@ -1,11 +1,10 @@
 package org.example.blogsakura.service.impl;
 
-import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
+import org.example.blogsakura.manager.CosManager;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.mapper.ChannelMapper;
@@ -13,17 +12,17 @@ import org.example.blogsakura.model.dto.article.Article;
 import org.example.blogsakura.mapper.ArticleMapper;
 import org.example.blogsakura.model.dto.article.ArticleQueryRequest;
 import org.example.blogsakura.model.dto.channel.Channel;
-import org.example.blogsakura.model.dto.user.UserQueryRequest;
 import org.example.blogsakura.model.vo.article.ArticleVO;
 import org.example.blogsakura.service.ArticleService;
 import org.example.blogsakura.service.ChannelService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +39,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Resource
     private ChannelMapper channelMapper;
+
+    @Resource
+    private CosManager cosManager;
 
     /**
      * 分页查询条件
@@ -114,6 +116,23 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
         }
         return articleList.stream().map(this::getArticleVO).collect(Collectors.toList());
+    }
+
+    /**
+     * 将上传的图片处理，作为一个File类上传到COS中
+     *
+     * @param file
+     * @return
+     */
+    public String uploadImageToCOS(MultipartFile file) {
+        String uuid = UUID.randomUUID().toString();
+        // 生成COS对象键（可以根据需要自定义路径格式）
+        String cosKey = "/blogs/images/" + uuid + ".png";
+        try {
+            return cosManager.uploadFileWithoutLocal(file, cosKey);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

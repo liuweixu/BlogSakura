@@ -27,19 +27,16 @@ function App() {
         const title = res.data.data.title;
         const content = res.data.data.content;
         const channel_id = res.data.data.channel_id;
-        const img_url = res.data.data.image_url;
+        const imgUrl = res.data.data.imageUrl;
         const res_channel = await getChannelById(channel_id.toString());
         const channel_name = res_channel.data.name;
-        const nowView = res.data.data.view;
-        console.log("当前阅读数:", nowView);
-        await updateArticleViewsById(id, nowView);
-        const res1 = await getArticleViewsById(id);
-        SetView(res1?.data);
+        const res1 = await updateArticleViewsById(id);
+        SetView(res1?.data.data);
         setData({
           title: title,
           content: content,
           channel_name: channel_name,
-          image_url: img_url,
+          imageUrl: imgUrl,
         });
       } catch (error) {
         console.error("获取文章列表失败:", error);
