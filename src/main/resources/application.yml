@@ -1,4 +1,13 @@
+# server端口
+server:
+  port: 8080
+  servlet:
+    context-path: /
 spring:
+  # 增大图像上传的上限
+  servlet:
+    multipart:
+      max-file-size: 10MB
   profiles:
     default: dev
   application:
@@ -65,3 +74,26 @@ cos:
     secret-id:
     secret-key:
     region:
+
+# spring-doc
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/**'
+      packages-to-scan: org.example.blogsakura.controller
+
+# knife4j
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# 过期时间设置
+redis-ttl:
+  base-expire: 3600

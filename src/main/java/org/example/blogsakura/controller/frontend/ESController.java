@@ -1,4 +1,4 @@
-package org.example.blogsakura.controller.backend;
+package org.example.blogsakura.controller.frontend;
 
 import jakarta.annotation.Resource;
 import org.example.blogsakura.common.common.BaseResponse;
@@ -18,13 +18,13 @@ public class ESController {
     private ESService esService;
 
 
-    @PostMapping("/search/title")
-    public BaseResponse<List<ArticleVO>> findArticleByTitle(@RequestBody Map<String, Object> data) {
-        return ResultUtils.success(esService.searchArticleVOByTitle(data.get("keyword").toString()));
-    }
+//    @PostMapping("/search/title")
+//    public BaseResponse<List<ArticleVO>> findArticleByTitle(@RequestBody Map<String, Object> data) {
+//        return ResultUtils.success(esService.searchArticleVOByTitle(data.get("keyword").toString()));
+//    }
 
     @PostMapping("/search")
     public BaseResponse<List<ArticleVO>> findArticleByTitleOrContent(@RequestBody Map<String, Object> data) {
-        return ResultUtils.success(esService.searchArticleVOByTitle(data.get("keyword").toString()));
+        return ResultUtils.success(esService.searchArticleOrContentVOByTitle(data.get("keyword").toString()));
     }
 }

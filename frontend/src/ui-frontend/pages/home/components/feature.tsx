@@ -1,24 +1,24 @@
 import { Col, Row } from "antd";
-import type { ArticleItem } from "@/ui-backend/interface/Article";
-import { getArticleHomeAPI } from "@/ui-frontend/apis/home";
+import type { ArticleVOBackend } from "@/ui-backend/interface/Article";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getArticleFeaturesAPI } from "@/ui-frontend/apis/home";
 export function Feature() {
-  const [data, setData] = useState<ArticleItem[]>([]);
+  const [data, setData] = useState<ArticleVOBackend[]>([]);
+  const getArticleList = async () => {
+    try {
+      const res = await getArticleFeaturesAPI();
+      // 确保data是数组，否则使用空数组
+      setData(res.data.data); // 注意这个，后台上因为添加拦截中，加上res.data，而这个是没加上，所以要多一个data
+    } catch (error) {
+      console.error("获取文章列表失败:", error);
+    }
+  };
   useEffect(() => {
-    const getArticleList = async () => {
-      try {
-        const res = await getArticleHomeAPI();
-        // 确保data是数组，否则使用空数组
-        setData(res.data.data); // 注意这个，后台上因为添加拦截中，加上res.data，而这个是没加上，所以要多一个data
-      } catch (error) {
-        console.error("获取文章列表失败:", error);
-      }
-    };
     getArticleList();
   }, []);
 
-  const features = data.slice(-3);
+  const features = data;
 
   function featureList() {
     return (
@@ -47,7 +47,7 @@ export function Feature() {
                 >
                   <img
                     src={
-                      invoice.image_url ||
+                      invoice.imageUrl ||
                       `https://api.r10086.com/樱道随机图片api接口.php?图片系列=风景系列${
                         Math.floor(Math.random() * 10) + 1
                       }`
@@ -64,7 +64,7 @@ export function Feature() {
                     {invoice.title}
                   </h3>
                   <p className="italic text-xs relative text-gray-300 text-center transtion-all duration-300 ease-linear delay-100 translate-x-full mt-4 h-10 leading-5 group-hover:translate-x-0 ellipsis-two">
-                    {invoice.content.replace(/<[^>]+>/g, "").slice(0, 10) +
+                    {invoice?.content?.replace(/<[^>]+>/g, "").slice(0, 10) +
                       "..."}
                   </p>
                 </div>

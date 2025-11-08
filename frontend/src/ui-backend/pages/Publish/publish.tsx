@@ -231,14 +231,14 @@ export function PublishArticle() {
                 uid: "-1",
                 name: res.data.data.imageUrl.split("/").pop() || "image.jpg",
                 status: "done",
-                url: `https://${res.data.data.imageUrl}`,
+                url: `${res.data.data.imageUrl}`,
                 response: { Location: res.data.data.imageUrl }, // 保持和上传成功一致
               },
             ];
             setFileValue(fileList);
           }
-          form.setFieldValue("content", res.data.data.content);
-          form.setFieldValue("imageType", res.data.data.imageType);
+          console.log(res.data.data.imageUrl);
+          form.setFieldValue("imageUrl", res.data.data.imageUrl);
         }
       }
     }

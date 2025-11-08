@@ -8,7 +8,16 @@ local defaultValue = tonumber(ARGV[1])
 local expireSeconds = tonumber(ARGV[2])
 
 local value = redis.call("GET", key)
--- Redis不存在，设置初始值为defaultValue，并设置过期时间ttl
-local num = defaultValue + 1
-redis.call("SET", key, num, "EX", expireSeconds)
-return num
+if value == false then
+    -- Redis不存在，设置初始值为defaultValue，并设置过期时间ttl
+    local num = defaultValue + 1
+    redis.call("SET", key, num, "EX", expireSeconds)
+    return num
+else
+    -- Redis存在，直接INCR
+    local result = redis.call("INCR", key)
+    -- 如果key没有过期时间，就设置过期时间
+    if redis.call("TTL", key) == -1 then
+        redis.call("EXPIRE", key, expireSeconds)
+    end
+end

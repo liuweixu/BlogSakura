@@ -1,4 +1,4 @@
-import type { ArticleItem } from "@/ui-backend/interface/Article";
+import type { ArticleVOBackendPage } from "@/ui-backend/interface/Article";
 import { getArticleHomeAPI } from "@/ui-frontend/apis/home";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -7,33 +7,37 @@ import { Pagination } from "antd";
 
 export function ListWrapper() {
   //处理分页信息
-  const [currentPage, setCurrentPage] = useState(1);
-  const onPageChange = (page: number) => {
-    setCurrentPage(page);
+  const onPageChange = (page: number, pageSize: number) => {
+    searchParams.currentPage = page;
+    searchParams.pageSize = pageSize;
+    getArticleList();
   };
-  const [count, setCount] = useState(0);
-  const pageSize = 10;
+  const [total, setTotal] = useState(0);
 
   // 获取文章列表
-  const [data, setData] = useState<ArticleItem[]>([]);
+  const [data, setData] = useState<ArticleVOBackendPage[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [searchParams, setSearchParams] = useState<ArticleVOBackendPage>({
+    currentPage: 1,
+    pageSize: 10,
+    sortField: "id",
+    sortOrder: "descend",
+  });
+  const getArticleList = async () => {
+    try {
+      const res = await getArticleHomeAPI(searchParams);
+      // 确保data是数组，否则使用空数组
+      setTotal(res.data.data.totalRow);
+      // 注意这个，后台上因为添加拦截中，加上res.data，而这个是没加上，所以要多一个data
+      setData(res.data.data.records);
+      console.log(res.data.data.records);
+    } catch (error) {
+      console.error("获取文章列表失败:", error);
+    }
+  };
   useEffect(() => {
-    const getArticleList = async () => {
-      try {
-        const res = await getArticleHomeAPI();
-        // 确保data是数组，否则使用空数组
-        setCount(res.data.data.length);
-        setData(
-          res.data.data.slice(
-            (currentPage - 1) * pageSize,
-            currentPage * pageSize
-          )
-        ); // 注意这个，后台上因为添加拦截中，加上res.data，而这个是没加上，所以要多一个data
-      } catch (error) {
-        console.error("获取文章列表失败:", error);
-      }
-    };
     getArticleList();
-  }, [currentPage]);
+  }, [searchParams.currentPage, searchParams.pageSize]);
 
   const Class = [
     "blog-item post-list-show left",
@@ -42,7 +46,7 @@ export function ListWrapper() {
 
   //对数据库的图像信息进行一定的处理
   const imageGet = (image_url: string) => {
-    if (image_url == null) {
+    if (image_url == "" || image_url == null) {
       return `https://api.r10086.com/樱道随机图片api接口.php?图片系列=风景系列${
         Math.floor(Math.random() * 10) + 1
       }`;
@@ -75,7 +79,7 @@ export function ListWrapper() {
                   <img
                     className="w-full h-full object-cover
                       pointer-events-none transition-all duration-600 blur-0"
-                    src={imageGet(invoice.image_url)}
+                    src={imageGet(invoice?.imageUrl || "")}
                     alt=""
                   />
                 </Link>
@@ -89,7 +93,7 @@ export function ListWrapper() {
               >
                 <div className="text-[#888] text-sm">
                   <i className="iconfont icon-time mr-1.5 text-[#989898] text-sm" />
-                  发布于 : {invoice.publish_date}
+                  发布于 : {invoice.publishDate?.toString().split("T")[0] || ""}
                 </div>
                 <Link to={"/article/" + invoice.id} className="block my-4.5">
                   <h3 className="line-clamp-2 overflow-hidden break-words font-bold text-[#504e4e] transition-colors duration-200 ease-out hover:text-[#fe9600]">
@@ -106,10 +110,10 @@ export function ListWrapper() {
                     <i className="iconfont icon-icon_mark mr-1.5 text-[#989898] text-xs" />
                     评论
                   </span> */}
-                  {invoice.channel_name && (
+                  {invoice.channel && (
                     <span>
                       <i className="iconfont icon-icon_file mr-1.5 text-[#989898] text-xs" />
-                      {invoice.channel_name}
+                      {invoice.channel}
                     </span>
                   )}
                 </div>
@@ -119,7 +123,7 @@ export function ListWrapper() {
                     className="overflow-hidden my-5 leading-6 line-clamp-3"
                     style={{ fontSize: "16px" }}
                   >
-                    {invoice.content.replace(/<[^>]+>/g, "")}
+                    {invoice?.content?.replace(/<[^>]+>/g, "")}
                   </p>
                   <div>
                     <Link to={"/article/" + invoice.id}>
@@ -150,9 +154,9 @@ export function ListWrapper() {
       <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
         <Pagination
           simple
-          current={currentPage}
-          pageSize={pageSize}
-          total={count}
+          current={searchParams.currentPage}
+          pageSize={searchParams.pageSize}
+          total={total}
           onChange={onPageChange}
         />
       </div>

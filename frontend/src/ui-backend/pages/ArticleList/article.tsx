@@ -33,6 +33,8 @@ export const Article = () => {
   const [searchParams, setSearchParams] = useState<ArticleVOBackendPage>({
     currentPage: 1,
     pageSize: 5,
+    sortField: "id",
+    sortOrder: "descend",
   });
   const [form] = Form.useForm();
   form.setFieldsValue(searchParams);
@@ -93,10 +95,16 @@ export const Article = () => {
       width: 120,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render: (cover: any) => {
-        if (cover == null) {
-          // return <img src={`https://www.loliapi.com/acg/?id=${Math.floor(Math.random() * 10 + 1)}`} width={80} height={60} alt=""/>
+        if (cover == "" || cover == null) {
           return (
-            <img src="/statics/images/404.png" width={80} height={60} alt="" />
+            <img
+              src={`https://api.r10086.com/樱道随机图片api接口.php?图片系列=风景系列${
+                Math.floor(Math.random() * 10) + 1
+              }`}
+              width={80}
+              height={60}
+              alt=""
+            />
           );
         } else {
           return <img src={cover || ""} width={80} height={60} alt="" />;

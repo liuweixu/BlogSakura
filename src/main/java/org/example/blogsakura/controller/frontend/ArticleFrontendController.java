@@ -1,8 +1,10 @@
 package org.example.blogsakura.controller.frontend;
 
+import cn.hutool.core.util.RandomUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomUtils;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.ResultUtils;
 import org.example.blogsakura.common.exception.ErrorCode;
@@ -13,7 +15,7 @@ import org.example.blogsakura.model.vo.article.ArticleVO;
 import org.example.blogsakura.service.ArticleService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/article")
@@ -63,5 +65,21 @@ public class ArticleFrontendController {
         List<ArticleVO> articleVOList = articleService.getArticleVOList(articlePage.getRecords());
         articleVOPage.setRecords(articleVOList);
         return ResultUtils.success(articleVOPage);
+    }
+
+    @GetMapping("/list/features")
+    public BaseResponse<List<ArticleVO>> getFrontendArticleVOListFeatures() {
+        List<ArticleVO> articleVOList = articleService.getArticleVOList(articleService.list());
+        int length = articleVOList.size();
+        Set<Integer> set = new HashSet<>();
+        while (set.size() < 3) {
+            int num = RandomUtil.randomInt(length) + 1;
+            set.add(num);
+        }
+        List<ArticleVO> results = new ArrayList<>();
+        for (int i = 0; i < set.size(); i++) {
+            results.add(articleVOList.get(i));
+        }
+        return ResultUtils.success(results);
     }
 }

@@ -98,7 +98,7 @@ public class OperateLogController {
      * @param page 分页对象
      * @return 分页对象
      */
-    @GetMapping("list/page")
+    @GetMapping("list/page/vo")
     public BaseResponse<Page<OperateLog>> getOperateLogListByPage(Page<OperateLog> page) {
         return ResultUtils.success(operateLogService.page(page));
     }

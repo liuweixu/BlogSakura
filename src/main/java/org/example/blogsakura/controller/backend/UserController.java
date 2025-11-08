@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.annotation.AuthCheck;
+import org.example.blogsakura.common.aop.Log;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.ResultUtils;
 import org.example.blogsakura.common.constants.UserConstant;
@@ -153,6 +154,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/register")
+    @Log("用户注册")
     public BaseResponse<Long> registerUser(@RequestBody UserRegisterRequest userRegisterRequest) {
         ThrowUtils.throwIf(userRegisterRequest == null, ErrorCode.PARAMS_ERROR);
         String userAccount = userRegisterRequest.getUserAccount();
@@ -169,6 +171,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/login")
+    @Log("登录用户")
     public BaseResponse<LoginUserVO> loginUser(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(userLoginRequest == null, ErrorCode.PARAMS_ERROR);
         String userAccount = userLoginRequest.getUserAccount();
@@ -191,6 +194,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
+    @Log("用户退出")
     public BaseResponse<Boolean> logoutUser(HttpServletRequest request) {
         ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR);
         return ResultUtils.success(userService.userLogout(request));

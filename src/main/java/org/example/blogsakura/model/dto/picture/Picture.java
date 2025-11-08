@@ -92,6 +92,9 @@ public class Picture implements Serializable {
     @Column("picFormat")
     private String picFormat;
 
+    @Column("userId")
+    private Long userId;
+
     /**
      * 创建时间
      */

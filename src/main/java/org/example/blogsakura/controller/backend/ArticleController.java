@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.blogsakura.common.aop.Log;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.ResultUtils;
 import org.example.blogsakura.common.constants.RabbitMQConstants;
@@ -51,6 +52,7 @@ public class ArticleController {
      * @return {@code true} 保存成功，{@code false} 保存失败
      */
     @PostMapping("/")
+    @Log("新增文章")
     public BaseResponse<Boolean> addArticle(@RequestBody ArticleVO articleVO) {
         log.info("articleVO: {}", articleVO.toString());
         String channel = articleVO.getChannel();
@@ -73,6 +75,7 @@ public class ArticleController {
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
     @DeleteMapping("/{id}")
+    @Log("删除文章")
     public BaseResponse<Boolean> removeArticleById(@PathVariable Long id) {
         boolean result = articleService.removeById(id);
         if (result) {
@@ -89,6 +92,7 @@ public class ArticleController {
      * @return {@code true} 更新成功，{@code false} 更新失败
      */
     @PutMapping("/")
+    @Log("更新文章")
     public BaseResponse<Boolean> updateArticle(@RequestBody ArticleVO articleVO) {
         String channel = articleVO.getChannel();
         Long channelId = channelMapper.getChannelByChannelName(channel).getId();

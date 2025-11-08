@@ -1,4 +1,5 @@
-import { deleteLoggingAPI, getLoggingAPI } from "@/ui-backend/apis/logging";
+import { deleteLoggingAPI, getLoggingPageAPI } from "@/ui-backend/apis/logging";
+import type { LoggingVOBackendPage } from "@/ui-backend/interface/Logging";
 import { Breadcrumb, Button, Card } from "antd";
 
 import { Table } from "antd";
@@ -7,30 +8,35 @@ import { useEffect, useState } from "react";
 export const LoggingPage = () => {
   // 获取日志记录信息
   const [logging, setLogging] = useState([]);
-  const [count, setCount] = useState(0);
+  const [total, setTotal] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [searchParams, setSearchParams] = useState<LoggingVOBackendPage>({
+    currentPage: 1,
+    pageSize: 10,
+  });
+  const getLoggingList = async () => {
+    const resLogging = await getLoggingPageAPI(searchParams);
+    setLogging(resLogging?.data.data.records);
+    setTotal(resLogging?.data.data.totalRow);
+  };
   useEffect(() => {
-    const getLoggingList = async () => {
-      const resLogging = await getLoggingAPI();
-      setLogging(resLogging?.data);
-      setCount(resLogging?.data.length);
-    };
     getLoggingList();
   }, []);
 
   const columns = [
     {
       title: "操作时间",
-      dataIndex: "operate_time",
+      dataIndex: "operateTime",
       width: 220,
     },
     {
       title: "操作名称",
-      dataIndex: "operate_name",
+      dataIndex: "operateName",
       width: 220,
     },
     {
       title: "消耗时间（单位：毫秒）",
-      dataIndex: "cost_time",
+      dataIndex: "costTime",
       width: 220,
     },
   ];
@@ -38,6 +44,13 @@ export const LoggingPage = () => {
   const onClearLog = async () => {
     await deleteLoggingAPI();
     setLogging([]);
+  };
+
+  const handleTableChange = (page: number, pageSize: number) => {
+    searchParams.currentPage = page;
+    searchParams.pageSize = pageSize;
+
+    getLoggingList();
   };
 
   return (
@@ -89,8 +102,11 @@ export const LoggingPage = () => {
           columns={columns}
           dataSource={logging}
           pagination={{
-            total: count,
-            pageSize: 10,
+            current: searchParams.currentPage,
+            pageSize: searchParams.pageSize,
+            total: total,
+            onChange: handleTableChange,
+            onShowSizeChange: handleTableChange,
           }}
         />
       </Card>

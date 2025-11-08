@@ -20,6 +20,12 @@ public interface UserMapper extends BaseMapper<User> {
     @Update("update user set userPassword = #{userPassword}, userName = #{userName}, userRole = #{userRole}, isDelete = #{isDelete} where id = #{id}")
     public boolean updateUserWithoutLogicDelete(User user);
 
+    /**
+     * 这部分必须要把逻辑删除行也搜索出来
+     *
+     * @param userAccount
+     * @return
+     */
     @Select("select * from user where userAccount = #{userAccount}")
     public User selectUserWithoutLogicDelete(String userAccount);
 
