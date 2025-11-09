@@ -153,6 +153,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         if (pictureId != null) {
             picture.setId(pictureId);
             picture.setEditTime(LocalDateTime.now());
+            cosManager.deletePicture(this.getById(pictureId).getUrl());
         }
         boolean result = this.saveOrUpdate(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "图片上传失败");

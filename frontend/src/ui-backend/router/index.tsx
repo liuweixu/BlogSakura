@@ -12,6 +12,7 @@ const Publish = lazy(() => import("@/ui-backend/pages/Publish"));
 const UserManager = lazy(() => import("@/ui-backend/pages/UserManager"));
 const ChannelList = lazy(() => import("@/ui-backend/pages/Channel"));
 const Logging = lazy(() => import("@/ui-backend/pages/Logging"));
+const Picture = lazy(() => import("@/ui-backend/pages/Picture"));
 
 export const RouterBackend = () => {
   return (
@@ -69,6 +70,14 @@ export const RouterBackend = () => {
           element={
             <Suspense fallback={"加载中"}>
               <ChannelList />
+            </Suspense>
+          }
+        />
+        <Route
+          path="picture"
+          element={
+            <Suspense fallback={"加载中"}>
+              <Picture />
             </Suspense>
           }
         />

@@ -136,7 +136,7 @@ public class CosManager {
         } catch (CosClientException e) {
             e.printStackTrace();
         }
-        cosClient.shutdown();
+        log.info("在cos删除图像成功");
         return true;
     }
 }

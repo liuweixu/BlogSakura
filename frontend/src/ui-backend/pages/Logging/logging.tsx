@@ -60,19 +60,21 @@ export const LoggingPage = () => {
 
   return (
     <div>
-      <Breadcrumb
-        separator=">"
-        items={[
-          {
-            title: "首页",
-            href: "/backend/",
-          },
-          {
-            title: "日志记录",
-            href: "/backend/logging",
-          },
-        ]}
-      />
+      <div>
+        <Breadcrumb
+          separator=">"
+          items={[
+            {
+              title: "首页",
+              href: "/backend/",
+            },
+            {
+              title: "日志记录",
+              href: "/backend/logging",
+            },
+          ]}
+        />
+      </div>
       {/**表格区域 */}
       <Card
         style={{

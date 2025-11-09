@@ -143,9 +143,6 @@ export async function getUploadPicture(
 ) {
   return request<API.BaseResponsePictureVO>("/backend/picture/upload", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     params: {
       ...params,
       pictureUploadRequest: undefined,

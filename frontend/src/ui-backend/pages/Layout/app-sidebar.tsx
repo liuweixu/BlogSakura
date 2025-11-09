@@ -6,6 +6,13 @@ import {
   UserOutlined,
   VideoCameraOutlined,
   LoginOutlined,
+  AndroidOutlined,
+  BarsOutlined,
+  FileImageOutlined,
+  FileOutlined,
+  FileAddOutlined,
+  DockerOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Popconfirm, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -70,33 +77,74 @@ const App: React.FC = () => {
                 },
                 {
                   key: "/backend/publish",
-                  icon: <VideoCameraOutlined />,
-                  label: "发布文章",
-                  onClick: () => navigate("/backend/publish"),
-                },
-                {
-                  key: "/backend/article/list",
-                  icon: <UploadOutlined />,
-                  label: "文章列表",
-                  onClick: () => navigate("/backend/article/list"),
+                  icon: <FileOutlined />,
+                  label: "文章管理",
+                  children: [
+                    {
+                      key: "/backend/publish",
+                      icon: <FileAddOutlined />,
+                      label: "发布文章",
+                      onClick: () => navigate("/backend/publish"),
+                    },
+                    {
+                      key: "/backend/article/list",
+                      icon: <BarsOutlined />,
+                      label: "文章列表",
+                      onClick: () => navigate("/backend/article/list"),
+                    },
+                  ],
                 },
                 {
                   key: "/backend/channel/list",
-                  icon: <UploadOutlined />,
-                  label: "频道列表",
-                  onClick: () => navigate("/backend/channel/list"),
+                  icon: <AppstoreOutlined />,
+                  label: "频道管理",
+                  children: [
+                    {
+                      key: "/backend/channel/list",
+                      icon: <BarsOutlined />,
+                      label: "频道列表",
+                      onClick: () => navigate("/backend/channel/list"),
+                    },
+                  ],
                 },
                 {
                   key: "/backend/user",
-                  icon: <UploadOutlined />,
-                  label: "用户管理器",
-                  onClick: () => navigate("/backend/user/list"),
+                  icon: <AndroidOutlined />,
+                  label: "用户管理",
+                  children: [
+                    {
+                      key: "/backend/user/list",
+                      icon: <BarsOutlined />,
+                      label: "用户列表",
+                      onClick: () => navigate("/backend/user/list"),
+                    },
+                  ],
+                },
+                {
+                  key: "/backend/picture",
+                  icon: <FileImageOutlined />,
+                  label: "个人图库管理",
+                  children: [
+                    {
+                      key: "/backend/picture",
+                      icon: <UploadOutlined />,
+                      label: "图像上传",
+                      onClick: () => navigate("/backend/picture"),
+                    },
+                  ],
                 },
                 {
                   key: "/backend/logging",
-                  icon: <UploadOutlined />,
-                  label: "日志记录",
-                  onClick: () => navigate("/backend/logging"),
+                  icon: <DockerOutlined />,
+                  label: "系统管理",
+                  children: [
+                    {
+                      key: "/backend/logging",
+                      icon: <BarsOutlined />,
+                      label: "日志列表",
+                      onClick: () => navigate("/backend/logging"),
+                    },
+                  ],
                 },
               ]}
             />

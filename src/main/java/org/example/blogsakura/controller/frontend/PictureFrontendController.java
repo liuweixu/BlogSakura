@@ -98,7 +98,7 @@ public class PictureFrontendController {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         // 操作数据库
-        boolean result = pictureService.save(picture);
+        boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }

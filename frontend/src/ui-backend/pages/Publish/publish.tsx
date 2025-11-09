@@ -254,7 +254,11 @@ export function PublishArticle() {
           },
           {
             title: `${articleId ? "编辑文章" : "发布文章"}`,
-            href: "/backend/publish",
+            href: `${
+              articleId
+                ? `/backend/publish?id=${articleId}`
+                : "/backend/publish"
+            }`,
           },
         ]}
         style={{ marginBottom: "36px" }}

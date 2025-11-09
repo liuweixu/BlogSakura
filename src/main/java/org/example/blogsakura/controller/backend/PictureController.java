@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.annotation.AuthCheck;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.DeleteRequest;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/backend/picture")
+@Slf4j
 public class PictureController {
 
     @Resource
@@ -100,7 +102,7 @@ public class PictureController {
         if (oldPicture == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "图片不存在");
         }
-        boolean result = pictureService.save(picture);
+        boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(result);
     }
@@ -166,12 +168,21 @@ public class PictureController {
         return ResultUtils.success(pictureService.getPictureVOPage(picturePage, request));
     }
 
+    /**
+     * 上传图像到图库
+     *
+     * @param multipartFile
+     * @param pictureUploadRequest
+     * @param request
+     * @return
+     */
     @PostMapping("/upload")
     public BaseResponse<PictureVO> getUploadPicture(
             @RequestPart("image") MultipartFile multipartFile,
             PictureUploadRequest pictureUploadRequest,
             HttpServletRequest request
     ) {
+        log.info("pictureUploadRequest:{}", JSONUtil.toJsonStr(pictureUploadRequest));
         User loginUser = userService.sessionLoginUser(request);
         PictureVO pictureVO = pictureService.uploadPicture(multipartFile, pictureUploadRequest, loginUser);
         return ResultUtils.success(pictureVO);

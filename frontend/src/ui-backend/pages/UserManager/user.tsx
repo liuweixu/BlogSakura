@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Form, Input, message, Space, Table } from "antd";
+import { Breadcrumb, Button, Form, Input, message, Space, Table } from "antd";
 import type { TableProps } from "antd";
 import { getUserVoListByPage, deleteUser } from "@/api/userController";
 
@@ -114,6 +114,20 @@ export const User = () => {
 
   return (
     <div>
+      <Breadcrumb
+        style={{ marginBottom: "36px" }}
+        separator=">"
+        items={[
+          {
+            title: "首页",
+            href: "/backend/",
+          },
+          {
+            title: "用户列表",
+            href: "/backend/user/list",
+          },
+        ]}
+      />
       <Form layout="inline" onFinish={handleSearch} form={form}>
         <div className="flex gap-10 items-center">
           <Form.Item name="userAccount" label="请输入账号">
