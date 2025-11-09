@@ -7,6 +7,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
@@ -83,10 +84,10 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         }
         queryWrapper.eq("id", id);
         queryWrapper.eq("userId", userId);
-        queryWrapper.like("name", name);
-        queryWrapper.like("introduction", introduction);
+        queryWrapper.like("name", name, StringUtils.isNotBlank(name));
+        queryWrapper.like("introduction", introduction, StringUtils.isNotBlank(introduction));
         queryWrapper.like("picFormat", picFormat);
-        queryWrapper.eq("category", category);
+        queryWrapper.eq("category", category, StringUtils.isNotBlank(category));
         queryWrapper.eq("picWidth", picWidth);
         queryWrapper.eq("picHeight", picHeight);
         queryWrapper.eq("picSize", picSize);

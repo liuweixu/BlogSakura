@@ -7,12 +7,21 @@ const Error = lazy(() => import("@/components/error"));
 const Login = lazy(() => import("@/ui-backend/pages/Login"));
 const Layout = lazy(() => import("@/ui-backend/pages/Layout"));
 const Home = lazy(() => import("@/ui-backend/pages/Home"));
-const ArticleList = lazy(() => import("@/ui-backend/pages/ArticleList"));
-const Publish = lazy(() => import("@/ui-backend/pages/Publish"));
+const ArticleList = lazy(
+  () => import("@/ui-backend/pages/ArticleManagement/ArticleList")
+);
+const Publish = lazy(
+  () => import("@/ui-backend/pages/ArticleManagement/Publish")
+);
 const UserManager = lazy(() => import("@/ui-backend/pages/UserManager"));
 const ChannelList = lazy(() => import("@/ui-backend/pages/Channel"));
 const Logging = lazy(() => import("@/ui-backend/pages/Logging"));
-const Picture = lazy(() => import("@/ui-backend/pages/Picture"));
+const Picture = lazy(
+  () => import("@/ui-backend/pages/PictureManagement/Picture")
+);
+const PictureList = lazy(
+  () => import("@/ui-backend/pages/PictureManagement/PictureList")
+);
 
 export const RouterBackend = () => {
   return (
@@ -86,6 +95,14 @@ export const RouterBackend = () => {
           element={
             <Suspense fallback={"加载中"}>
               <Logging />
+            </Suspense>
+          }
+        />
+        <Route
+          path="picture/list"
+          element={
+            <Suspense fallback={"加载中"}>
+              <PictureList />
             </Suspense>
           }
         />

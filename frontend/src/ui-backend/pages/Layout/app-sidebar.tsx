@@ -4,15 +4,14 @@ import {
   MenuUnfoldOutlined,
   UploadOutlined,
   UserOutlined,
-  VideoCameraOutlined,
   LoginOutlined,
   AndroidOutlined,
   BarsOutlined,
-  FileImageOutlined,
   FileOutlined,
   FileAddOutlined,
   DockerOutlined,
   AppstoreOutlined,
+  PictureOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Popconfirm, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -122,7 +121,7 @@ const App: React.FC = () => {
                 },
                 {
                   key: "/backend/picture",
-                  icon: <FileImageOutlined />,
+                  icon: <PictureOutlined />,
                   label: "个人图库管理",
                   children: [
                     {
@@ -130,6 +129,12 @@ const App: React.FC = () => {
                       icon: <UploadOutlined />,
                       label: "图像上传",
                       onClick: () => navigate("/backend/picture"),
+                    },
+                    {
+                      key: "/backend/picture/list",
+                      icon: <BarsOutlined />,
+                      label: "图像列表",
+                      onClick: () => navigate("/backend/picture/list"),
                     },
                   ],
                 },

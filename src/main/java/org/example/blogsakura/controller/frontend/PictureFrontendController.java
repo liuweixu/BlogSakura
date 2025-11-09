@@ -54,7 +54,7 @@ public class PictureFrontendController {
      * @param pictureQueryRequest 分页查询请求
      * @return 分页对象
      */
-    @GetMapping("/list/page/vo")
+    @PostMapping("/list/page/vo")
     public BaseResponse<Page<PictureVO>> getFrontendPictureVOListByPage(@RequestBody PictureQueryRequest pictureQueryRequest,
                                                                         HttpServletRequest request) {
         long currentPage = pictureQueryRequest.getCurrentPage();

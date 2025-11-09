@@ -139,7 +139,7 @@ public class PictureController {
      * @param pictureQueryRequest 分页查询请求
      * @return 分页对象
      */
-    @GetMapping("/list/page")
+    @PostMapping("/list/page")
     public BaseResponse<Page<Picture>> getPictureListByPage(@RequestBody PictureQueryRequest pictureQueryRequest) {
         long currentPage = pictureQueryRequest.getCurrentPage();
         long pageSize = pictureQueryRequest.getPageSize();
@@ -155,7 +155,7 @@ public class PictureController {
      * @param pictureQueryRequest 分页查询请求
      * @return 分页对象
      */
-    @GetMapping("/list/page/vo")
+    @PostMapping("/list/page/vo")
     public BaseResponse<Page<PictureVO>> getPictureVOListByPage(@RequestBody PictureQueryRequest pictureQueryRequest,
                                                                 HttpServletRequest request) {
         long currentPage = pictureQueryRequest.getCurrentPage();

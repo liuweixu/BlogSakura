@@ -94,6 +94,9 @@ export async function getUploadFile(
 ) {
   return request<API.BaseResponseString>("/backend/article/upload/image", {
     method: "POST",
+    // headers: {
+    //   "Content-Type": "application/json",
+    // },
     data: body,
     ...(options || {}),
   });

@@ -84,38 +84,34 @@ export async function getPictureVoList(options?: { [key: string]: any }) {
   });
 }
 
-/** 此处后端没有提供注释 GET /backend/picture/list/page */
+/** 此处后端没有提供注释 POST /backend/picture/list/page */
 export async function getPictureListByPage(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getPictureListByPageParams,
+  body: API.PictureQueryRequest,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponsePagePicture>("/backend/picture/list/page", {
-    method: "GET",
-    params: {
-      ...params,
-      pictureQueryRequest: undefined,
-      ...params["pictureQueryRequest"],
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
+    data: body,
     ...(options || {}),
   });
 }
 
-/** 此处后端没有提供注释 GET /backend/picture/list/page/vo */
+/** 此处后端没有提供注释 POST /backend/picture/list/page/vo */
 export async function getPictureVoListByPage(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getPictureVOListByPageParams,
+  body: API.PictureQueryRequest,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponsePagePictureVO>(
     "/backend/picture/list/page/vo",
     {
-      method: "GET",
-      params: {
-        ...params,
-        pictureQueryRequest: undefined,
-        ...params["pictureQueryRequest"],
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      data: body,
       ...(options || {}),
     }
   );
@@ -143,6 +139,9 @@ export async function getUploadPicture(
 ) {
   return request<API.BaseResponsePictureVO>("/backend/picture/upload", {
     method: "POST",
+    // headers: {
+    //   "Content-Type": "application/json",
+    // },
     params: {
       ...params,
       pictureUploadRequest: undefined,

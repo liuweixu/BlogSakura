@@ -14,6 +14,7 @@ import {
 } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import {
+  getPictureListTagCategory,
   getPictureVoById,
   getUploadPicture,
   updatePicture,
@@ -206,6 +207,22 @@ export function PictureManagement() {
     getOldPicture();
   }, []);
 
+  // 获取标签和分类选项
+  const [tagList, setTagList] = useState<string[]>([]);
+  const [categoryList, setCategoryList] = useState<string[]>([]);
+  const getTagCategoryOptions = async () => {
+    const res = await getPictureListTagCategory();
+    if (res.data.code === 0 && res.data.data) {
+      const { tagList, categoryList } = res.data.data;
+      setTagList(tagList ?? []);
+      setCategoryList(categoryList ?? []);
+    }
+  };
+
+  useEffect(() => {
+    getTagCategoryOptions();
+  }, []);
+
   return (
     <div>
       {contextHolder}
@@ -249,10 +266,18 @@ export function PictureManagement() {
             <Input.TextArea />
           </Form.Item>
           <Form.Item name="category" label="分类" layout="vertical">
-            <AutoComplete />
+            <AutoComplete
+              options={categoryList.map((category) => ({
+                label: category,
+                value: category,
+              }))}
+            />
           </Form.Item>
           <Form.Item name="tags" label="标签" layout="vertical">
-            <Select />
+            <Select
+              options={tagList.map((tag) => ({ label: tag, value: tag }))}
+              mode="tags"
+            />
           </Form.Item>
           <Form.Item className="flex flex-row justify-center items-center">
             <Space>

@@ -202,24 +202,12 @@ declare namespace API {
     id: number;
   };
 
-  type getFrontendPictureVOListByPageParams = {
-    pictureQueryRequest: PictureQueryRequest;
-  };
-
   type getOperateLogByIdParams = {
     id: number;
   };
 
-  type getPictureListByPageParams = {
-    pictureQueryRequest: PictureQueryRequest;
-  };
-
   type getPictureVOByIdParams = {
     id: number;
-  };
-
-  type getPictureVOListByPageParams = {
-    pictureQueryRequest: PictureQueryRequest;
   };
 
   type getUploadPictureParams = {
