@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Form, Input, message, Space, Table } from "antd";
 import type { TableProps } from "antd";
-import { listUserVoByPage, removeUserById } from "@/api/userController";
+import { getUserVoListByPage, deleteUser } from "@/api/userController";
 
 export const User = () => {
   const columns: TableProps<API.UserVO>["columns"] = [
@@ -62,15 +62,16 @@ export const User = () => {
   form.setFieldsValue(searchParams);
 
   const getUserList = async () => {
-    const resUserList = await listUserVoByPage(searchParams);
+    const resUserList = await getUserVoListByPage(searchParams);
     const records = resUserList?.data?.data?.records ?? [];
     setUserList(records);
     const newTotal = resUserList?.data?.data?.totalRow ?? 0;
     setTotal(newTotal);
   };
 
-  const handleDelete = async (id: number) => {
-    const res = await removeUserById({ id });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDelete = async (id: any) => {
+    const res = await deleteUser({ id: id });
     if (res.data.code === 0) {
       message.success("删除成功");
       // 检查删除后当前页是否为空

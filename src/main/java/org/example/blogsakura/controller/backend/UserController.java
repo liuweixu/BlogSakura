@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.annotation.AuthCheck;
 import org.example.blogsakura.common.aop.Log;
 import org.example.blogsakura.common.common.BaseResponse;
+import org.example.blogsakura.common.common.DeleteRequest;
 import org.example.blogsakura.common.common.ResultUtils;
 import org.example.blogsakura.common.constants.UserConstant;
 import org.example.blogsakura.common.exception.BusinessException;
@@ -95,15 +96,17 @@ public class UserController {
     }
 
     /**
-     * 根据主键删除用户:管理者
+     * 根据删除请求删除用户:管理者
      *
-     * @param id 主键
+     * @param deleteRequest 删除请求
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/")
 //    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> removeUserById(@PathVariable Long id) {
-        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(deleteRequest == null, ErrorCode.PARAMS_ERROR);
+        Long id = deleteRequest.getId();
+        ThrowUtils.throwIf(id == null || id <= 0, ErrorCode.PARAMS_ERROR);
         return ResultUtils.success(userService.removeById(id));
     }
 
@@ -133,7 +136,7 @@ public class UserController {
      */
     @PostMapping("list/page/vo")
 //    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest) {
+    public BaseResponse<Page<UserVO>> getUserVOListByPage(@RequestBody UserQueryRequest userQueryRequest) {
         ThrowUtils.throwIf(userQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long currentPage = userQueryRequest.getCurrentPage();
         long pageSize = userQueryRequest.getPageSize();
@@ -188,7 +191,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/session/login")
-    public BaseResponse<LoginUserVO> loginUserSession(HttpServletRequest request) {
+    public BaseResponse<LoginUserVO> SessionLoginUser(HttpServletRequest request) {
         User loginUser = userService.sessionLoginUser(request);
         return ResultUtils.success(userService.getLoginUserVO(loginUser));
     }

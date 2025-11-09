@@ -2,21 +2,26 @@ package org.example.blogsakura.controller.backend;
 
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.aop.Log;
 import org.example.blogsakura.common.common.BaseResponse;
+import org.example.blogsakura.common.common.DeleteRequest;
 import org.example.blogsakura.common.common.ResultUtils;
 import org.example.blogsakura.common.constants.RabbitMQConstants;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
 import org.example.blogsakura.manager.ArticleBloomFilter;
+import org.example.blogsakura.manager.CosManager;
+import org.example.blogsakura.manager.PictureMessage;
 import org.example.blogsakura.mapper.ChannelMapper;
 import org.example.blogsakura.model.dto.article.ArticleQueryRequest;
 import org.example.blogsakura.model.dto.channel.Channel;
 import org.example.blogsakura.model.vo.article.ArticleVO;
 import org.example.blogsakura.service.ChannelService;
+import org.example.blogsakura.service.PictureService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +54,13 @@ public class ArticleController {
     @Resource
     private ArticleBloomFilter articleBloomFilter;
 
+    @Resource
+    private PictureMessage pictureMessage;
+    @Autowired
+    private PictureService pictureService;
+    @Autowired
+    private CosManager cosManager;
+
     /**
      * 新增文章表。
      *
@@ -77,12 +89,15 @@ public class ArticleController {
     /**
      * 根据主键删除文章表。
      *
-     * @param id 主键
+     * @param deleteRequest 删除请求
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/")
     @Log("删除文章")
-    public BaseResponse<Boolean> removeArticleById(@PathVariable Long id) {
+    public BaseResponse<Boolean> deleteArticle(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(deleteRequest == null, ErrorCode.PARAMS_ERROR);
+        Long id = deleteRequest.getId();
+        ThrowUtils.throwIf(id == null || id <= 0, ErrorCode.PARAMS_ERROR);
         boolean result = articleService.removeById(id);
         if (result) {
             rabbitTemplate.convertAndSend(RabbitMQConstants.ARTICLE_EXCHANGE,
@@ -105,9 +120,12 @@ public class ArticleController {
         Article article = new Article();
         BeanUtils.copyProperties(articleVO, article);
         article.setChannelId(channelId);
-        article.setId(Long.valueOf(articleVO.getId()));
+        article.setId(articleVO.getId());
+        // 更新前把COS中的图像删除掉
+        String imgUrl = articleService.getById(articleVO.getId()).getImageUrl();
+        boolean resultDelete = cosManager.deletePicture(imgUrl);
         boolean result = articleService.updateById(article);
-        if (result) {
+        if (result && resultDelete) {
             rabbitTemplate.convertAndSend(RabbitMQConstants.ARTICLE_EXCHANGE,
                     RabbitMQConstants.ARTICLE_INSERT_KEY, article.getId());
         }

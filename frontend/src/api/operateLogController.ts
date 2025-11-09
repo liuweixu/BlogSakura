@@ -32,6 +32,21 @@ export async function addOperateLog(
   });
 }
 
+/** 此处后端没有提供注释 DELETE /backend/logging/ */
+export async function deleteOperateLog(
+  body: API.DeleteRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean>("/backend/logging/", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 此处后端没有提供注释 GET /backend/logging/${param0} */
 export async function getOperateLogById(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -41,20 +56,6 @@ export async function getOperateLogById(
   const { id: param0, ...queryParams } = params;
   return request<API.BaseResponseOperateLog>(`/backend/logging/${param0}`, {
     method: "GET",
-    params: { ...queryParams },
-    ...(options || {}),
-  });
-}
-
-/** 此处后端没有提供注释 DELETE /backend/logging/${param0} */
-export async function removeOperateLogById(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.removeOperateLogByIdParams,
-  options?: { [key: string]: any }
-) {
-  const { id: param0, ...queryParams } = params;
-  return request<API.BaseResponseBoolean>(`/backend/logging/${param0}`, {
-    method: "DELETE",
     params: { ...queryParams },
     ...(options || {}),
   });

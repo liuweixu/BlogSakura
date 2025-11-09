@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Popconfirm, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { loginUserSession, logoutUser } from "@/api/userController";
+import { sessionLoginUser, logoutUser } from "@/api/userController";
 const { Header, Sider, Content } = Layout;
 
 const App: React.FC = () => {
@@ -39,7 +39,7 @@ const App: React.FC = () => {
 
   //处理未登录时，同样后端界面的情况
   const getIsLogin = async () => {
-    const res = await loginUserSession();
+    const res = await sessionLoginUser();
     setIsLogin(res?.data.message !== "未登录");
   };
   // const getUserInfo = async () => {

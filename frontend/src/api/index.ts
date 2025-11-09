@@ -2,8 +2,9 @@
 /* eslint-disable */
 // API 更新时间：
 // API 唯一标识：
-import * as pictureController from "./pictureController";
+import * as pictureFrontendController from "./pictureFrontendController";
 import * as userController from "./userController";
+import * as pictureController from "./pictureController";
 import * as operateLogController from "./operateLogController";
 import * as channelController from "./channelController";
 import * as articleController from "./articleController";
@@ -12,8 +13,9 @@ import * as articleFrontendController from "./articleFrontendController";
 import * as healthController from "./healthController";
 import * as viewController from "./viewController";
 export default {
-  pictureController,
+  pictureFrontendController,
   userController,
+  pictureController,
   operateLogController,
   channelController,
   articleController,

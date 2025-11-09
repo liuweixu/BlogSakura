@@ -20,10 +20,7 @@ import { useEffect, useState } from "react";
 import { Table } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 
-import {
-  getArticleVoListByPage,
-  removeArticleById,
-} from "@/api/articleController";
+import { getArticleVoListByPage, deleteArticle } from "@/api/articleController";
 
 export const Article = () => {
   const navigate = useNavigate();
@@ -53,8 +50,9 @@ export const Article = () => {
   }, [searchParams.currentPage, searchParams.pageSize]);
 
   // 删除文章(删除后要更新文章列表)
-  const handleDelete = async (id: number) => {
-    const res = await removeArticleById({ id });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleDelete = async (id: any) => {
+    const res = await deleteArticle({ id: id });
     if (res.data.code === 0) {
       message.success("删除成功");
       // 检查删除后当前页是否为空

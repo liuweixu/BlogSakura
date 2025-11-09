@@ -65,6 +65,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListPictureVO = {
+    code?: number;
+    data?: PictureVO[];
+    message?: string;
+  };
+
   type BaseResponseLoginUserVO = {
     code?: number;
     data?: LoginUserVO;
@@ -101,9 +107,33 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePagePicture = {
+    code?: number;
+    data?: PagePicture;
+    message?: string;
+  };
+
+  type BaseResponsePagePictureVO = {
+    code?: number;
+    data?: PagePictureVO;
+    message?: string;
+  };
+
   type BaseResponsePageUserVO = {
     code?: number;
     data?: PageUserVO;
+    message?: string;
+  };
+
+  type BaseResponsePictureTagCategory = {
+    code?: number;
+    data?: PictureTagCategory;
+    message?: string;
+  };
+
+  type BaseResponsePictureVO = {
+    code?: number;
+    data?: PictureVO;
     message?: string;
   };
 
@@ -152,6 +182,10 @@ declare namespace API {
     articleNumbers?: number;
   };
 
+  type DeleteRequest = {
+    id?: number;
+  };
+
   type getArticleVOByIdParams = {
     id: number;
   };
@@ -164,12 +198,32 @@ declare namespace API {
     id: number;
   };
 
-  type getInfoParams = {
+  type getFrontendPictureVOByIdParams = {
     id: number;
+  };
+
+  type getFrontendPictureVOListByPageParams = {
+    pictureQueryRequest: PictureQueryRequest;
   };
 
   type getOperateLogByIdParams = {
     id: number;
+  };
+
+  type getPictureListByPageParams = {
+    pictureQueryRequest: PictureQueryRequest;
+  };
+
+  type getPictureVOByIdParams = {
+    id: number;
+  };
+
+  type getPictureVOListByPageParams = {
+    pictureQueryRequest: PictureQueryRequest;
+  };
+
+  type getUploadPictureParams = {
+    pictureUploadRequest: PictureUploadRequest;
   };
 
   type getUserByIdParams = {
@@ -235,12 +289,17 @@ declare namespace API {
     optimizeCountQuery?: boolean;
   };
 
-  type pageParams = {
-    page: PagePicture;
-  };
-
   type PagePicture = {
     records?: Picture[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalPage?: number;
+    totalRow?: number;
+    optimizeCountQuery?: boolean;
+  };
+
+  type PagePictureVO = {
+    records?: PictureVO[];
     pageNumber?: number;
     pageSize?: number;
     totalPage?: number;
@@ -276,24 +335,59 @@ declare namespace API {
     isDelete?: number;
   };
 
-  type removeArticleByIdParams = {
-    id: number;
+  type PictureQueryRequest = {
+    currentPage?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    name?: string;
+    introduction?: string;
+    category?: string;
+    tags?: string[];
+    picSize?: number;
+    picWidth?: number;
+    picHeight?: number;
+    picScale?: number;
+    picFormat?: string;
+    searchText?: string;
+    userId?: number;
   };
 
-  type removeChannelByIdParams = {
-    id: number;
+  type PictureTagCategory = {
+    tagList?: string[];
+    categoryList?: string[];
   };
 
-  type removeOperateLogByIdParams = {
-    id: number;
+  type PictureUpdateRequest = {
+    id?: number;
+    name?: string;
+    introduction?: string;
+    category?: string;
+    tags?: string[];
   };
 
-  type removeParams = {
-    id: number;
+  type PictureUploadRequest = {
+    id?: number;
   };
 
-  type removeUserByIdParams = {
-    id: number;
+  type PictureVO = {
+    id?: number;
+    url?: string;
+    name?: string;
+    introduction?: string;
+    tags?: string[];
+    category?: string;
+    picSize?: number;
+    picWidth?: number;
+    picHeight?: number;
+    picScale?: number;
+    picFormat?: string;
+    userId?: number;
+    createTime?: string;
+    editTime?: string;
+    updateTime?: string;
+    user?: UserVO;
   };
 
   type updateViewsParams = {

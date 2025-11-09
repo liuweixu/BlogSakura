@@ -2,9 +2,11 @@ package org.example.blogsakura.controller.backend;
 
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.common.BaseResponse;
+import org.example.blogsakura.common.common.DeleteRequest;
 import org.example.blogsakura.common.common.ResultUtils;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
@@ -53,13 +55,16 @@ public class OperateLogController {
     }
 
     /**
-     * 根据主键删除操作日志表。
+     * 删除操作日志表。
      *
-     * @param id 主键
+     * @param deleteRequest 根据删除请求删除日志表
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
-    @DeleteMapping("/{id}")
-    public BaseResponse<Boolean> removeOperateLogById(@PathVariable BigInteger id) {
+    @DeleteMapping("/")
+    public BaseResponse<Boolean> deleteOperateLog(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(deleteRequest == null, ErrorCode.PARAMS_ERROR);
+        Long id = deleteRequest.getId();
+        ThrowUtils.throwIf(id == null || id <= 0, ErrorCode.PARAMS_ERROR);
         return ResultUtils.success(operateLogService.removeById(id));
     }
 

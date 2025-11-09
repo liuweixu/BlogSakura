@@ -2,7 +2,9 @@ package org.example.blogsakura.controller.backend;
 
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.blogsakura.common.common.BaseResponse;
+import org.example.blogsakura.common.common.DeleteRequest;
 import org.example.blogsakura.common.common.ResultUtils;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
@@ -45,13 +47,16 @@ public class ChannelController {
     }
 
     /**
-     * 根据主键删除频道表。
+     * 删除频道表。
      *
-     * @param id 主键
+     * @param deleteRequest 根据删除请求删除文章
      * @return {@code true} 删除成功，{@code false} 删除失败
      */
-    @DeleteMapping("/{id}")
-    public BaseResponse<Boolean> removeChannelById(@PathVariable Long id) {
+    @DeleteMapping("/")
+    public BaseResponse<Boolean> deleteChannel(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(deleteRequest == null, ErrorCode.PARAMS_ERROR);
+        Long id = deleteRequest.getId();
+        ThrowUtils.throwIf(id == null || id <= 0, ErrorCode.PARAMS_ERROR);
         return ResultUtils.success(channelService.removeById(id));
     }
 
