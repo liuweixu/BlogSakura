@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { marked } from "marked";
 import "github-markdown-css/github-markdown.css";
 import "./mainwrapper_style.css";
@@ -9,6 +9,7 @@ import { updateViews } from "@/api/viewController";
 function App() {
   const location = useLocation();
   const id = location.pathname.split("/")[2];
+  const navigate = useNavigate();
   const [data, setData] = useState<API.ArticleVO>();
   // 计算文章阅读数
   const [view, SetView] = useState(0);
@@ -17,6 +18,10 @@ function App() {
     try {
       //
       const res = await getFrontendArticleVoById({ id: id.toString() });
+      if (res.data.code !== 0 || !res.data.data) {
+        navigate("/error");
+        return;
+      }
       setData(res.data.data);
       const res1 = await updateViews({ id: id.toString() });
       const viewValue = res1?.data.data ?? 0;
