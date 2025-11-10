@@ -8,6 +8,7 @@ const Article = lazy(() => import("@/ui-frontend/pages/article"));
 const Header = lazy(() => import("@/ui-frontend/pages/header"));
 const Error = lazy(() => import("@/components/error"));
 const Pictures = lazy(() => import("@/ui-frontend/pages/pictures"));
+const PictureInfo = lazy(() => import("@/ui-frontend/pages/pictureInfo"));
 
 export const RouterFrontend = () => {
   const location = useLocation();
@@ -44,6 +45,14 @@ export const RouterFrontend = () => {
           element={
             <Suspense fallback={"加载中"}>
               <Pictures />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/picture/:id"
+          element={
+            <Suspense fallback={"加载中"}>
+              <PictureInfo />
             </Suspense>
           }
         />

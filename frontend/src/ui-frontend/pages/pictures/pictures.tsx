@@ -14,6 +14,7 @@ import {
 import { getFrontendPictureVoListByPage } from "@/api/pictureFrontendController";
 import { getPictureListTagCategory } from "@/api/pictureController";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [data, setData] = useState<API.PictureVO[]>([]);
@@ -21,6 +22,8 @@ function App() {
   const [form] = Form.useForm();
   const [category, setCategory] = useState<string[]>([]);
   const [tagsList, setTagsList] = useState<string[]>([]);
+  const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchParams, setSearchParams] = useState<API.PictureQueryRequest>({
     currentPage: 1,
     pageSize: 12,
@@ -163,8 +166,21 @@ function App() {
                       />
                     </div>
                   }
+                  onClick={() => {
+                    navigate(`/picture/${item.id}`);
+                  }}
                 >
-                  Card content
+                  <Card.Meta
+                    title={item.name}
+                    description={
+                      <div className="flex flex-nowrap overflow-hidden text-ellipsis">
+                        <Tag color="#2db7f5">{item.category || "默认"}</Tag>
+                        {item.tags?.map((tag) => {
+                          return <Tag key={tag}>{tag}</Tag>;
+                        })}
+                      </div>
+                    }
+                  />
                 </Card>
               </List.Item>
             )}
