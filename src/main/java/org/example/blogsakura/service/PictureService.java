@@ -37,14 +37,14 @@ public interface PictureService extends IService<Picture> {
     public Picture getPicureVO(Picture picture, HttpServletRequest request);
 
     /**
-     * 上传图片到云图，用户目前默认为管理者admin
+     * 上传图片到COS，用户目前默认为管理者admin
      *
-     * @param multipartFile
+     * @param inputSource
      * @param pictureUploadRequest
      * @param loginUser
      * @return
      */
-    PictureVO uploadPicture(MultipartFile multipartFile,
+    PictureVO uploadPicture(Object inputSource,
                             PictureUploadRequest pictureUploadRequest,
                             User loginUser);
 

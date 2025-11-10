@@ -123,7 +123,7 @@ public class ArticleController {
         article.setId(articleVO.getId());
         // 更新前把COS中的图像删除掉
         String imgUrl = articleService.getById(articleVO.getId()).getImageUrl();
-        boolean resultDelete = cosManager.deletePicture(imgUrl);
+        boolean resultDelete = cosManager.deleteCOSPicture(imgUrl);
         boolean result = articleService.updateById(article);
         if (result && resultDelete) {
             rabbitTemplate.convertAndSend(RabbitMQConstants.ARTICLE_EXCHANGE,

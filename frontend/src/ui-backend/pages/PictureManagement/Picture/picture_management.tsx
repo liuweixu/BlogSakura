@@ -10,13 +10,15 @@ import {
   notification,
   Select,
   Space,
+  Tabs,
   Upload,
 } from "antd";
-import type { GetProp, UploadFile, UploadProps } from "antd";
+import type { GetProp, TabsProps, UploadFile, UploadProps } from "antd";
 import {
   getPictureListTagCategory,
   getPictureVoById,
   getUploadPicture,
+  getUploadPictureByUrl,
   updatePicture,
 } from "@/api/pictureController";
 import "./picture.css";
@@ -85,7 +87,7 @@ export function PictureManagement() {
   };
 
   /**
-   * 自定义上传图片
+   * 自定义上传图片 涉及到文件上传
    * @param options 上传参数
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,7 +111,7 @@ export function PictureManagement() {
       // 根据后端返回的数据结构调整
       const pictureResponse = response?.data?.data ?? "";
       setPicData(pictureResponse as API.PictureVO);
-      setPictureId(pictureResponse.id);
+      setPictureId(pictureResponse?.id ?? 0);
       // 更新文件列表，添加响应信息
       setFileList((prevList: UploadFile[]) => {
         return prevList.map((item) => {
@@ -151,8 +153,22 @@ export function PictureManagement() {
     }
   };
 
-  const onReset = () => {
-    setFileList([]);
+  // Url上传图像
+  const handleUrlSearch = async (value: string) => {
+    const res = await getUploadPictureByUrl({ fileUrl: value });
+    if (res.data.code === 0 && res.data.data) {
+      setPicData(res.data.data as API.PictureVO);
+      setPictureId(res.data.data?.id ?? 0);
+      setFileList([
+        {
+          uid: "-1",
+          name: res.data.data.name ?? "",
+          status: "done",
+          url: res.data.data.url,
+          response: { Location: res.data.data.url },
+        },
+      ]);
+    }
   };
 
   /**
@@ -174,6 +190,13 @@ export function PictureManagement() {
       message.success("图片更新成功");
       navigate(`/backend/picture?id=${pictureUpdateRequest.id}`);
     }
+  };
+
+  /**
+   * 重置
+   */
+  const onReset = () => {
+    setFileList([]);
   };
 
   //获取旧图像
@@ -218,33 +241,16 @@ export function PictureManagement() {
       setCategoryList(categoryList ?? []);
     }
   };
-
   useEffect(() => {
     getTagCategoryOptions();
   }, []);
 
-  return (
-    <div>
-      {contextHolder}
-      <Breadcrumb
-        separator=">"
-        items={[
-          {
-            title: "首页",
-            href: "/backend/",
-          },
-          {
-            title: `${searchParamsId ? "编辑图片" : "创建图片"}`,
-            href: `${
-              searchParamsId
-                ? `/backend/picture?id=${searchParamsId}`
-                : "/backend/picture"
-            }`,
-          },
-        ]}
-        style={{ marginBottom: "36px" }}
-      />
-      <div className="picture-upload">
+  // Tabs部分信息
+  const itemTabs: TabsProps["items"] = [
+    {
+      key: "file",
+      label: "文件上传",
+      children: (
         <Form onFinish={onFinish} form={form}>
           <Form.Item name="picture" layout="vertical">
             <Upload
@@ -290,6 +296,91 @@ export function PictureManagement() {
             </Space>
           </Form.Item>
         </Form>
+      ),
+    },
+    {
+      key: "url",
+      label: "URL上传",
+      children: (
+        <Form onFinish={onFinish} form={form}>
+          <Form.Item>
+            <Input.Search
+              placeholder="input search text"
+              onSearch={handleUrlSearch}
+              enterButton
+            />
+          </Form.Item>
+          <Form.Item name="picture" layout="vertical">
+            <Upload
+              action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+              listType="picture-card"
+              fileList={fileList}
+              onPreview={handlePreview}
+              onChange={handleChange}
+              beforeUpload={beforeUpload}
+              customRequest={customRequest}
+            >
+              {fileList.length >= 1 ? null : uploadButton}
+            </Upload>
+          </Form.Item>
+          <Form.Item name="title" label="名称" layout="vertical">
+            <Input />
+          </Form.Item>
+          <Form.Item name="profile" label="简介" layout="vertical">
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item name="category" label="分类" layout="vertical">
+            <AutoComplete
+              options={categoryList.map((category) => ({
+                label: category,
+                value: category,
+              }))}
+            />
+          </Form.Item>
+          <Form.Item name="tags" label="标签" layout="vertical">
+            <Select
+              options={tagList.map((tag) => ({ label: tag, value: tag }))}
+              mode="tags"
+            />
+          </Form.Item>
+          <Form.Item className="flex flex-row justify-center items-center">
+            <Space>
+              <Button type="primary" htmlType="submit">
+                提交
+              </Button>
+              <Button htmlType="button" onClick={onReset}>
+                重置
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      ),
+    },
+  ];
+
+  return (
+    <div>
+      {contextHolder}
+      <Breadcrumb
+        separator=">"
+        items={[
+          {
+            title: "首页",
+            href: "/backend/",
+          },
+          {
+            title: `${searchParamsId ? "编辑图片" : "创建图片"}`,
+            href: `${
+              searchParamsId
+                ? `/backend/picture?id=${searchParamsId}`
+                : "/backend/picture"
+            }`,
+          },
+        ]}
+        style={{ marginBottom: "36px" }}
+      />
+      <div className="picture-upload">
+        <Tabs items={itemTabs} defaultActiveKey="file" />
       </div>
     </div>
   );

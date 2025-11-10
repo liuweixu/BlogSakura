@@ -151,3 +151,18 @@ export async function getUploadPicture(
     ...(options || {}),
   });
 }
+
+/** 此处后端没有提供注释 POST /backend/picture/upload/url */
+export async function getUploadPictureByUrl(
+  body: API.PictureUploadRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePictureVO>("/backend/picture/upload/url", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}

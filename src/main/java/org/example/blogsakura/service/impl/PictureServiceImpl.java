@@ -116,16 +116,18 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     }
 
     /**
-     * 上传图片到云图，用户目前默认为管理者admin
+     * 上传图片到COS，用户目前默认为管理者admin
+     * 新增URL方式
      *
-     * @param multipartFile
+     * @param inputSource
      * @param pictureUploadRequest
      * @param loginUser
      * @return
      */
     @Override
-    public PictureVO uploadPicture(MultipartFile multipartFile, PictureUploadRequest pictureUploadRequest, User loginUser) {
+    public PictureVO uploadPicture(Object inputSource, PictureUploadRequest pictureUploadRequest, User loginUser) {
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NO_AUTH_ERROR);
+        ThrowUtils.throwIf(inputSource == null, ErrorCode.PARAMS_ERROR);
         // 用于判断新增还是更新图片
         Long pictureId = null;
         if (pictureUploadRequest.getId() != null) {
@@ -139,7 +141,12 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         }
         // 上传图片得到信息
         String uploadPathPrefix = "/personal_pictures";
-        UploadPictureResult uploadPictureResult = cosManager.uploadPicture(multipartFile, uploadPathPrefix);
+        UploadPictureResult uploadPictureResult = null;
+        if (inputSource instanceof MultipartFile) {
+            uploadPictureResult = cosManager.uploadPicture((MultipartFile) inputSource, uploadPathPrefix);
+        } else {
+            uploadPictureResult = cosManager.uploadPictureByUrl((String) inputSource, uploadPathPrefix);
+        }
         // 新增图片信息或者更新图片信息
         Picture picture = new Picture();
         picture.setPicHeight(uploadPictureResult.getPicHeight());
@@ -154,7 +161,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         if (pictureId != null) {
             picture.setId(pictureId);
             picture.setEditTime(LocalDateTime.now());
-            cosManager.deletePicture(this.getById(pictureId).getUrl());
+            cosManager.deleteCOSPicture(this.getById(pictureId).getUrl());
         }
         boolean result = this.saveOrUpdate(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "图片上传失败");
@@ -247,7 +254,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     @Override
     public boolean deleteDeepPicture(Long id) {
         String url = this.getById(id).getUrl();
-        boolean resultDeletePicture = cosManager.deletePicture(url);
+        boolean resultDeletePicture = cosManager.deleteCOSPicture(url);
         ThrowUtils.throwIf(!resultDeletePicture, ErrorCode.OPERATION_ERROR);
         return pictureMapper.deleteDeepPicture(id);
     }

@@ -169,7 +169,7 @@ public class PictureController {
     }
 
     /**
-     * 上传图像到图库
+     * 上传图像到COS
      *
      * @param multipartFile
      * @param pictureUploadRequest
@@ -185,6 +185,25 @@ public class PictureController {
         log.info("pictureUploadRequest:{}", JSONUtil.toJsonStr(pictureUploadRequest));
         User loginUser = userService.sessionLoginUser(request);
         PictureVO pictureVO = pictureService.uploadPicture(multipartFile, pictureUploadRequest, loginUser);
+        return ResultUtils.success(pictureVO);
+    }
+
+    /**
+     * 上传URL到COS
+     *
+     * @param pictureUploadRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/upload/url")
+    public BaseResponse<PictureVO> getUploadPictureByUrl(
+            @RequestBody PictureUploadRequest pictureUploadRequest,
+            HttpServletRequest request
+    ) {
+        log.info("pictureUploadRequest:{}", JSONUtil.toJsonStr(pictureUploadRequest));
+        User loginUser = userService.sessionLoginUser(request);
+        String fileUrl = pictureUploadRequest.getFileUrl();
+        PictureVO pictureVO = pictureService.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
         return ResultUtils.success(pictureVO);
     }
 
