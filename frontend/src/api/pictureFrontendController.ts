@@ -4,7 +4,7 @@ import request from "@/ui-backend/utils";
 
 /** 此处后端没有提供注释 PUT /picture/ */
 export async function editFrontendPicture(
-  body: API.PictureEditRequest,
+  body: API.PictureUpdateRequest,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponseBoolean>("/picture/", {

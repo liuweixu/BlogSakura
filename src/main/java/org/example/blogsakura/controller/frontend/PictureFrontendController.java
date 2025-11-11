@@ -3,7 +3,6 @@ package org.example.blogsakura.controller.frontend;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.update.UpdateChain;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,7 @@ import org.example.blogsakura.common.constants.UserConstant;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
+import org.example.blogsakura.mapper.SpaceMapper;
 import org.example.blogsakura.model.dto.picture.Picture;
 import org.example.blogsakura.model.dto.picture.PictureEditRequest;
 import org.example.blogsakura.model.dto.picture.PictureQueryRequest;
@@ -51,8 +51,10 @@ public class PictureFrontendController {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private SpaceService spaceService;
-    @Autowired
+    @Resource
     private TransactionTemplate transactionTemplate;
+    @Resource
+    private SpaceMapper spaceMapper;
 
     /**
      * 分页查询图片，返回封装的Picture
@@ -77,6 +79,9 @@ public class PictureFrontendController {
             // 私有空间
             User loginUser = userService.sessionLoginUser(request);
             Space space = spaceService.getById(spaceId);
+            log.info("space.getUserId():{}", space.getUserId());
+            log.info("loginUser.getId():{}", loginUser.getId());
+            pictureQueryRequest.setNullSpaceId(false);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
             if (!loginUser.getId().equals(space.getUserId())) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间权限");
@@ -131,12 +136,12 @@ public class PictureFrontendController {
      * @return {@code true} 更新成功，{@code false} 更新失败
      */
     @PutMapping("/")
-    public BaseResponse<Boolean> editFrontendPicture(@RequestBody PictureEditRequest pictureEditRequest,
+    public BaseResponse<Boolean> editFrontendPicture(@RequestBody PictureUpdateRequest pictureEditRequest,
                                                      HttpServletRequest request) {
         ThrowUtils.throwIf(pictureEditRequest == null, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.sessionLoginUser(request);
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
-        boolean result = pictureService.editPicture(pictureEditRequest, loginUser);
+        boolean result = pictureService.updatePicture(pictureEditRequest, request);
         return ResultUtils.success(result);
     }
 
@@ -165,11 +170,7 @@ public class PictureFrontendController {
             // 释放额度
             Long spaceId = picture.getSpaceId();
             if (spaceId != null) {
-                boolean update = UpdateChain.of(spaceService)
-                        .eq(Space::getId, spaceId)
-                        .setRaw("totalSize = totalSize - ?", picture.getPicSize())
-                        .setRaw("totalCount = totalCount - ?", 1)
-                        .update();
+                boolean update = spaceMapper.decrementSpaceMySpace(spaceId, picture.getPicSize(), 1);
                 ThrowUtils.throwIf(!update, ErrorCode.OPERATION_ERROR, "额度更新失败");
             }
             pictureService.deleteDeepPicture(id);

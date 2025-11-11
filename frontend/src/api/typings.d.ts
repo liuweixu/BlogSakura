@@ -355,15 +355,6 @@ declare namespace API {
     isDelete?: number;
   };
 
-  type PictureEditRequest = {
-    id?: number;
-    name?: string;
-    introduction?: string;
-    category?: string;
-    tags?: string[];
-    spaceId?: number;
-  };
-
   type PictureQueryRequest = {
     currentPage?: number;
     pageSize?: number;

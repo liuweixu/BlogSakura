@@ -52,6 +52,10 @@ const App: React.FC = () => {
       res.data.data.userRole === "admin"
     ) {
       setIsLogin(true);
+    } else if (res?.data.data && res?.data.data.userRole === "user") {
+      setIsLogin(false);
+    } else {
+      setIsLogin(false);
     }
   };
   // const getUserInfo = async () => {

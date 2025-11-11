@@ -13,10 +13,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AntDesignOutlined } from "@ant-design/icons";
 import { deletePicture } from "@/api/pictureController";
+import { sessionLoginUser } from "@/api/userController";
 
 function App() {
   const [pictureInfo, setPictureInfo] = useState<API.PictureVO>({});
-  const [isSpaceId, setIsSpaceId] = useState(false);
+  const [spaceId, setSpaceId] = useState<number | undefined>();
+  const [userRole, setUserRole] = useState<string | undefined>();
+  const [isEditDelete, setIsEditDelete] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
   const id = params.id;
@@ -27,15 +30,29 @@ function App() {
       navigate("/error");
       return;
     }
-    console.log("spaceId: " + res.data.data.spaceId);
-    if (res.data.data.spaceId === null) {
-      setIsSpaceId(true);
+    if (res.data.data.spaceId) {
+      setSpaceId(res.data.data.spaceId);
     }
     setPictureInfo(res.data.data);
+    const resUser = await sessionLoginUser();
+    if (resUser.data.code === 0 && resUser.data.data) {
+      setUserRole(resUser.data.data.userRole);
+    }
   };
   useEffect(() => {
     getPictureInfo();
   }, []);
+
+  // 根据用户角色和 spaceId 判断是否显示编辑删除按钮
+  useEffect(() => {
+    if (userRole === "admin" && spaceId === undefined) {
+      setIsEditDelete(true);
+    } else if (userRole === "user" && spaceId !== undefined) {
+      setIsEditDelete(true);
+    } else {
+      setIsEditDelete(false);
+    }
+  }, [userRole, spaceId]);
   // 描述列表信息
   const items: DescriptionsProps["items"] = [
     {
@@ -130,6 +147,16 @@ function App() {
       message.error("删除失败");
     }
   };
+  // 编辑图像
+  const handleEdit = (id: number) => {
+    if (spaceId) {
+      navigate(
+        `/personal_space/private_pictures/add?id=${id}&spaceId=${spaceId}`
+      );
+    } else {
+      navigate(`/backend/picture?id=${id}`);
+    }
+  };
   return (
     <div className="mt-20 mx-4">
       <Row>
@@ -144,13 +171,11 @@ function App() {
               items={items}
               size="middle"
             />
-            {isSpaceId && (
+            {isEditDelete && (
               <div className="flex flex-row justify-center items-center gap-4">
                 <Button
                   type="primary"
-                  onClick={() => {
-                    navigate(`/backend/picture?id=${pictureInfo.id}`);
-                  }}
+                  onClick={() => handleEdit(pictureInfo.id ?? 0)}
                   className="mt-4"
                   icon={<AntDesignOutlined />}
                 >

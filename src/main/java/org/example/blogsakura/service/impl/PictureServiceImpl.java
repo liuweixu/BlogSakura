@@ -6,15 +6,16 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
 import org.example.blogsakura.manager.CosManager;
+import org.example.blogsakura.mapper.SpaceMapper;
 import org.example.blogsakura.model.dto.picture.*;
 import org.example.blogsakura.mapper.PictureMapper;
 import org.example.blogsakura.model.dto.space.Space;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
  * @author <a href="https://github.com/liuweixu">liuweixu</a>
  */
 @Service
+@Slf4j
 public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> implements PictureService {
 
     private final CosManager cosManager;
@@ -47,14 +49,16 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     private final PictureMapper pictureMapper;
     private final SpaceService spaceService;
     private final TransactionTemplate transactionTemplate;
+    private SpaceMapper spaceMapper;
 
     public PictureServiceImpl(CosManager cosManager, UserService userService, PictureMapper pictureMapper,
-                              SpaceService spaceService, TransactionTemplate transactionTemplate) {
+                              SpaceService spaceService, TransactionTemplate transactionTemplate, SpaceMapper spaceMapper) {
         this.cosManager = cosManager;
         this.userService = userService;
         this.pictureMapper = pictureMapper;
         this.spaceService = spaceService;
         this.transactionTemplate = transactionTemplate;
+        this.spaceMapper = spaceMapper;
     }
 
     /**
@@ -158,6 +162,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         }
         // 校验空间是否存在
         Long spaceId = pictureUploadRequest.getSpaceId();
+        log.info("空间spaceId:{}", spaceId);
         if (spaceId != null) {
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.PARAMS_ERROR, "空间不存在");
@@ -203,11 +208,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
             boolean result = this.saveOrUpdate(finalPicture);
             ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "图片上传失败");
             if (spaceId != null) {
-                boolean update = UpdateChain.of(spaceService)
-                        .eq(Space::getId, spaceId)
-                        .setRaw("totalSize = totalSize + ?", finalPicture.getPicSize())
-                        .setRaw("totalCount = totalCount + ?", 1)
-                        .update();
+                boolean update = spaceMapper.incrementSpaceMySpace(spaceId, finalPicture.getPicSize(), 1);
                 ThrowUtils.throwIf(!update, ErrorCode.OPERATION_ERROR, "额度更新失败");
             }
             return finalPicture;

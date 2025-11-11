@@ -12,6 +12,9 @@ const PictureInfo = lazy(() => import("@/ui-frontend/pages/pictureInfo"));
 const Pictures = lazy(() => import("@/ui-frontend/pages/pictures"));
 const Layout = lazy(() => import("@/ui-frontend/pages/Space/Layout"));
 const MySpace = lazy(() => import("@/ui-frontend/pages/Space/my_space"));
+const PictureUpload = lazy(
+  () => import("@/ui-frontend/pages/Space/pictureupload")
+);
 
 export const RouterFrontend = () => {
   const location = useLocation();
@@ -75,7 +78,23 @@ export const RouterFrontend = () => {
               </Suspense>
             }
           />
+          <Route
+            path="private_pictures/add"
+            element={
+              <Suspense fallback={"加载中"}>
+                <PictureUpload />
+              </Suspense>
+            }
+          />
         </Route>
+        <Route
+          path="/picture/:id"
+          element={
+            <Suspense fallback={"加载中"}>
+              <PictureInfo />
+            </Suspense>
+          }
+        />
         <Route
           path="/picture/:id"
           element={
