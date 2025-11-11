@@ -3,13 +3,15 @@ import { lazy } from "react";
 import { Suspense } from "react";
 
 // 懒加载组件
-const Home = lazy(() => import("@/ui-frontend/pages/home"));
+const Home = lazy(() => import("@/ui-frontend/pages/Home"));
 const Article = lazy(() => import("@/ui-frontend/pages/article"));
 const Header = lazy(() => import("@/ui-frontend/pages/header"));
 const Error = lazy(() => import("@/components/error"));
 const SpacePictures = lazy(() => import("@/ui-frontend/pages/Space/pictures"));
 const PictureInfo = lazy(() => import("@/ui-frontend/pages/pictureInfo"));
 const Pictures = lazy(() => import("@/ui-frontend/pages/pictures"));
+const Layout = lazy(() => import("@/ui-frontend/pages/Space/Layout"));
+const MySpace = lazy(() => import("@/ui-frontend/pages/Space/my_space"));
 
 export const RouterFrontend = () => {
   const location = useLocation();
@@ -53,10 +55,27 @@ export const RouterFrontend = () => {
           path="/personal_space"
           element={
             <Suspense fallback={"加载中"}>
-              <SpacePictures />
+              <Layout />
             </Suspense>
           }
-        />
+        >
+          <Route
+            path=""
+            element={
+              <Suspense fallback={"加载中"}>
+                <SpacePictures />
+              </Suspense>
+            }
+          />
+          <Route
+            path="private_pictures"
+            element={
+              <Suspense fallback={"加载中"}>
+                <MySpace />
+              </Suspense>
+            }
+          />
+        </Route>
         <Route
           path="/picture/:id"
           element={

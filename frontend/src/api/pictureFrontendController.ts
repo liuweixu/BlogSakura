@@ -3,12 +3,27 @@
 import request from "@/ui-backend/utils";
 
 /** 此处后端没有提供注释 PUT /picture/ */
-export async function updateFrontendPicture(
-  body: API.PictureUpdateRequest,
+export async function editFrontendPicture(
+  body: API.PictureEditRequest,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponseBoolean>("/picture/", {
     method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 此处后端没有提供注释 DELETE /picture/ */
+export async function deleteFrontendPicture(
+  body: API.DeleteRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean>("/picture/", {
+    method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
@@ -37,6 +52,21 @@ export async function getFrontendPictureVoListByPage(
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponsePagePictureVO>("/picture/list/page/vo", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 此处后端没有提供注释 POST /picture/list/page/vo/cache */
+export async function getFrontendPictureVoListByPageWithCache(
+  body: API.PictureQueryRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePagePictureVO>("/picture/list/page/vo/cache", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

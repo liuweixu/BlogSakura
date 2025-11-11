@@ -1,22 +1,23 @@
 import { Affix } from "antd";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   HomeOutlined,
   FolderOutlined,
   UserOutlined,
   AndroidOutlined,
 } from "@ant-design/icons";
-import SimpleSearch from "./search";
+import SimpleSearch from "@/ui-frontend/pages/header/search";
 
 function App() {
   const location = useLocation();
   const currentPath = location.pathname;
+  const navigate = useNavigate();
 
   const navItems = [
     { path: "/", label: "首页", icon: HomeOutlined },
     { path: "/pictures", label: "图库", icon: FolderOutlined },
     { path: "/personal_space", label: "私有空间", icon: FolderOutlined },
-    { path: "/backend", label: "后台", icon: AndroidOutlined },
+    { path: "/backend", label: "管理者界面", icon: AndroidOutlined },
   ];
 
   const isActive = (path: string) => {
@@ -24,6 +25,10 @@ function App() {
       return currentPath === "/";
     }
     return currentPath.startsWith(path);
+  };
+
+  const userLogin = () => {
+    navigate("/backend/login");
   };
 
   return (
@@ -39,7 +44,7 @@ function App() {
                 to="/"
                 className="text-[#464646] text-[20px] font-extrabold hover:text-[#fe9600]"
               >
-                weixuliu's blog
+                迷子のブログ
               </Link>
             </div>
             <div
@@ -73,7 +78,10 @@ function App() {
             </div>
             <div id="nav-right" className="flex items-center space-x-4">
               <SimpleSearch mode="icon" />
-              <UserOutlined className="text-[#666666] text-lg cursor-pointer hover:text-[#fe9600]" />
+              <UserOutlined
+                className="text-[#666666] text-lg cursor-pointer hover:text-[#fe9600]"
+                onClick={userLogin}
+              />
             </div>
           </div>
         </div>

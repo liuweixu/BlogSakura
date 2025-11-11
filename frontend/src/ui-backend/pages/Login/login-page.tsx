@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { useForm, type FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { message } from "antd";
+import { getSpaceVoListByPage } from "@/api/spaceController";
 
 export function LoginPage() {
   const form = useForm();
@@ -39,7 +41,10 @@ export function LoginPage() {
             userPassword: fromValue.userPassword,
           });
           console.log(res.data.message);
-          if (res?.data.message == "ok") {
+          if (
+            res?.data.message == "ok" &&
+            res?.data.data?.userRole === "admin"
+          ) {
             navigate("/backend/"); //跳转至首页
             toast.success("登录成功", {
               description: "Sunday, December 03, 2023 at 9:00 AM",
@@ -48,6 +53,23 @@ export function LoginPage() {
                 onClick: () => console.log("Undo"),
               },
             });
+          } else if (res.data.data && res.data.data.userRole === "user") {
+            message.success("进入私有空间");
+            const resSpace = await getSpaceVoListByPage({
+              currentPage: 1,
+              pageSize: 1,
+              sortField: "id",
+              sortOrder: "descend",
+              userId: res.data.data.id,
+            });
+            const records = resSpace?.data?.data?.records ?? [];
+            if (resSpace.data.code === 0 && resSpace.data.data) {
+              const spaceId = records[0]?.id ?? undefined;
+              window.location.href =
+                "/personal_space/private_pictures?id=" + spaceId;
+            } else {
+              message.error("获取私有空间失败");
+            }
           } else {
             toast.success("登录失败", {
               description: "Sunday, December 03, 2023 at 9:00 AM",

@@ -3,6 +3,7 @@ package org.example.blogsakura.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
@@ -28,6 +29,7 @@ import java.util.Optional;
  * @author <a href="https://github.com/liuweixu">liuweixu</a>
  */
 @Service
+@Slf4j
 public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements SpaceService {
 
     /**
@@ -122,7 +124,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
         lock.lock();
         try {
             Long newSpaceId = transactionTemplate.execute(status -> {
-                boolean exist = this.query().eq(Space::getUserId, userId).hasCondition();
+                boolean exist = exists(this.query().eq(Space::getUserId, userId));
                 ThrowUtils.throwIf(exist, ErrorCode.OPERATION_ERROR, "每个用户只能有一个私有空间");
                 // 写入数据库
                 boolean result = this.save(space);

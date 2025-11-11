@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Breadcrumb, Button, Form, Input, message, Space, Table } from "antd";
 import type { TableProps } from "antd";
-import { deletePicture, getPictureListByPage } from "@/api/pictureController";
+import { deletePicture, getPictureVoListByPage } from "@/api/pictureController";
 import { useNavigate } from "react-router-dom";
 import { AntDesignOutlined } from "@ant-design/icons";
 
@@ -107,7 +107,7 @@ export const App = () => {
     },
   ];
 
-  const [pictureList, setPictureList] = useState<API.Picture[]>([]);
+  const [pictureList, setPictureList] = useState<API.PictureVO[]>([]);
   const [total, setTotal] = useState(0);
   const [searchParams, setSearchParams] = useState<API.PictureQueryRequest>({
     currentPage: 1,
@@ -119,7 +119,7 @@ export const App = () => {
   form.setFieldsValue(searchParams);
 
   const getPictureList = async () => {
-    const resUserList = await getPictureListByPage(
+    const resUserList = await getPictureVoListByPage(
       searchParams as API.PictureQueryRequest
     );
     const records = resUserList?.data?.data?.records ?? [];

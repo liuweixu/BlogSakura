@@ -47,7 +47,7 @@ public class PictureController {
 
     @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private SpaceService spaceService;
 
     /**
@@ -62,7 +62,7 @@ public class PictureController {
     }
 
     /**
-     * TODO 管理员根据删除请求删除图片。
+     * TODO 根据删除请求删除图片。
      *
      * @param deleteRequest 删除请求
      * @return {@code true} 删除成功，{@code false} 删除失败
@@ -74,9 +74,11 @@ public class PictureController {
         Long id = deleteRequest.getId();
         ThrowUtils.throwIf(id == null || id <= 0, ErrorCode.PARAMS_ERROR);
         Picture picture = pictureService.getById(id);
+        User loginUser = userService.sessionLoginUser(request);
         if (picture == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "图片id不存在");
         }
+        // 操作数据库
         boolean result = pictureService.removeById(id);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(result);
@@ -90,24 +92,10 @@ public class PictureController {
      */
     @PutMapping("/")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> updatePicture(@RequestBody PictureUpdateRequest pictureUpdateRequest) {
+    public BaseResponse<Boolean> updatePicture(@RequestBody PictureUpdateRequest pictureUpdateRequest,
+                                               HttpServletRequest request) {
         ThrowUtils.throwIf(pictureUpdateRequest == null, ErrorCode.PARAMS_ERROR);
-        Picture picture = new Picture();
-        BeanUtils.copyProperties(pictureUpdateRequest, picture);
-        // 处理tags
-        picture.setTags(JSONUtil.toJsonStr(pictureUpdateRequest.getTags()));
-        // 设置编辑时间或更新时间
-        picture.setEditTime(LocalDateTime.now());
-        // 校验
-        pictureService.validPicture(picture);
-        // 更新图像前，判断id是否存在
-        Long pictureId = pictureUpdateRequest.getId();
-        Picture oldPicture = pictureService.getById(pictureId);
-        if (oldPicture == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "图片不存在");
-        }
-        boolean result = pictureService.updateById(picture);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        boolean result = pictureService.updatePicture(pictureUpdateRequest, request);
         return ResultUtils.success(result);
     }
 
@@ -122,7 +110,7 @@ public class PictureController {
     }
 
     /**
-     * 根据主键获取封装图片。
+     * 根据主键获取封装图片（管理员）。
      *
      * @param id 图片管理主键
      * @return 图片管理详情
@@ -155,6 +143,8 @@ public class PictureController {
 
     /**
      * 分页查询图片，返回封装的Picture
+     * 以防万一，补充一下spaceId，表示只查询公共图像
+     * 此处只表示公共图库，即后端和前端瀑布流图库，用这个方法
      *
      * @param pictureQueryRequest 分页查询请求
      * @return 分页对象
@@ -164,8 +154,7 @@ public class PictureController {
                                                                 HttpServletRequest request) {
         long currentPage = pictureQueryRequest.getCurrentPage();
         long pageSize = pictureQueryRequest.getPageSize();
-        // 限制爬虫
-        ThrowUtils.throwIf(pageSize > 20, ErrorCode.PARAMS_ERROR);
+        pictureQueryRequest.setNullSpaceId(true);
         // 查询数据库
         Page<Picture> picturePage = pictureService.page(Page.of(currentPage, pageSize),
                 pictureService.getQueryWrapper(pictureQueryRequest));

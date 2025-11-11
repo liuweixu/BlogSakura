@@ -1,9 +1,11 @@
 package org.example.blogsakura.service;
 
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 import org.example.blogsakura.model.dto.space.Space;
 import org.example.blogsakura.model.dto.space.SpaceAddRequest;
 import org.example.blogsakura.model.dto.user.User;
+import org.example.blogsakura.model.vo.space.SpaceVO;
 
 /**
  * 空间 服务层。

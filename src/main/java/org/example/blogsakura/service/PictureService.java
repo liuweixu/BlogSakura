@@ -5,9 +5,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.blogsakura.model.dto.picture.Picture;
-import org.example.blogsakura.model.dto.picture.PictureQueryRequest;
-import org.example.blogsakura.model.dto.picture.PictureUploadRequest;
+import org.example.blogsakura.model.dto.picture.*;
 import org.example.blogsakura.model.dto.user.User;
 import org.example.blogsakura.model.vo.picture.PictureVO;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,5 +79,28 @@ public interface PictureService extends IService<Picture> {
      */
     boolean deleteDeepPicture(Long id);
 
+    /**
+     * 更新图像
+     *
+     * @param pictureUpdateRequest
+     * @return
+     */
+    boolean updatePicture(PictureUpdateRequest pictureUpdateRequest, HttpServletRequest request);
 
+
+    /**
+     * 图像处理的权限逻辑
+     *
+     * @param loginUser
+     * @param picture
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
+
+    /**
+     * 针对私有空间上的用户修改文件
+     *
+     * @param pictureEditRequest
+     * @param loginUser
+     */
+    boolean editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 }

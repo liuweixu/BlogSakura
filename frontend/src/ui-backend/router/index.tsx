@@ -23,6 +23,11 @@ const PictureList = lazy(
   () => import("@/ui-backend/pages/PictureManagement/PictureList")
 );
 
+const Space = lazy(() => import("@/ui-backend/pages/SpaceManagement/Space"));
+const SpaceList = lazy(
+  () => import("@/ui-backend/pages/SpaceManagement/SpaceList")
+);
+
 export const RouterBackend = () => {
   return (
     <Routes>
@@ -103,6 +108,22 @@ export const RouterBackend = () => {
           element={
             <Suspense fallback={"加载中"}>
               <PictureList />
+            </Suspense>
+          }
+        />
+        <Route
+          path="space"
+          element={
+            <Suspense fallback={"加载中"}>
+              <Space />
+            </Suspense>
+          }
+        />
+        <Route
+          path="space/list"
+          element={
+            <Suspense fallback={"加载中"}>
+              <SpaceList />
             </Suspense>
           }
         />

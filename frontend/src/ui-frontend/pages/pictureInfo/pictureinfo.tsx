@@ -16,6 +16,7 @@ import { deletePicture } from "@/api/pictureController";
 
 function App() {
   const [pictureInfo, setPictureInfo] = useState<API.PictureVO>({});
+  const [isSpaceId, setIsSpaceId] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
   const id = params.id;
@@ -26,7 +27,10 @@ function App() {
       navigate("/error");
       return;
     }
-
+    console.log("spaceId: " + res.data.data.spaceId);
+    if (res.data.data.spaceId === null) {
+      setIsSpaceId(true);
+    }
     setPictureInfo(res.data.data);
   };
   useEffect(() => {
@@ -140,28 +144,30 @@ function App() {
               items={items}
               size="middle"
             />
-            <div className="flex flex-row justify-center items-center gap-4">
-              <Button
-                type="primary"
-                onClick={() => {
-                  navigate(`/backend/picture?id=${pictureInfo.id}`);
-                }}
-                className="mt-4"
-                icon={<AntDesignOutlined />}
-              >
-                编辑
-              </Button>
-              <Button
-                danger
-                onClick={async () => {
-                  await handleDelete(pictureInfo.id ?? 0);
-                }}
-                className="mt-4"
-                icon={<AntDesignOutlined />}
-              >
-                删除
-              </Button>
-            </div>
+            {isSpaceId && (
+              <div className="flex flex-row justify-center items-center gap-4">
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    navigate(`/backend/picture?id=${pictureInfo.id}`);
+                  }}
+                  className="mt-4"
+                  icon={<AntDesignOutlined />}
+                >
+                  编辑
+                </Button>
+                <Button
+                  danger
+                  onClick={async () => {
+                    await handleDelete(pictureInfo.id ?? 0);
+                  }}
+                  className="mt-4"
+                  icon={<AntDesignOutlined />}
+                >
+                  删除
+                </Button>
+              </div>
+            )}
           </Card>
         </Col>
       </Row>

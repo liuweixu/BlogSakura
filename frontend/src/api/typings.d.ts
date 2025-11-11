@@ -71,6 +71,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListSpaceLevel = {
+    code?: number;
+    data?: SpaceLevel[];
+    message?: string;
+  };
+
   type BaseResponseLoginUserVO = {
     code?: number;
     data?: LoginUserVO;
@@ -119,6 +125,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePageSpace = {
+    code?: number;
+    data?: PageSpace;
+    message?: string;
+  };
+
   type BaseResponsePageUserVO = {
     code?: number;
     data?: PageUserVO;
@@ -134,6 +146,12 @@ declare namespace API {
   type BaseResponsePictureVO = {
     code?: number;
     data?: PictureVO;
+    message?: string;
+  };
+
+  type BaseResponseSpaceVO = {
+    code?: number;
+    data?: SpaceVO;
     message?: string;
   };
 
@@ -207,6 +225,10 @@ declare namespace API {
   };
 
   type getPictureVOByIdParams = {
+    id: number;
+  };
+
+  type getSpaceVOByIdParams = {
     id: number;
   };
 
@@ -295,6 +317,15 @@ declare namespace API {
     optimizeCountQuery?: boolean;
   };
 
+  type PageSpace = {
+    records?: Space[];
+    pageNumber?: number;
+    pageSize?: number;
+    totalPage?: number;
+    totalRow?: number;
+    optimizeCountQuery?: boolean;
+  };
+
   type PageUserVO = {
     records?: UserVO[];
     pageNumber?: number;
@@ -320,7 +351,17 @@ declare namespace API {
     createTime?: string;
     editTime?: string;
     updateTime?: string;
+    spaceId?: number;
     isDelete?: number;
+  };
+
+  type PictureEditRequest = {
+    id?: number;
+    name?: string;
+    introduction?: string;
+    category?: string;
+    tags?: string[];
+    spaceId?: number;
   };
 
   type PictureQueryRequest = {
@@ -340,6 +381,8 @@ declare namespace API {
     picFormat?: string;
     searchText?: string;
     userId?: number;
+    spaceId?: number;
+    nullSpaceId?: boolean;
   };
 
   type PictureTagCategory = {
@@ -353,11 +396,13 @@ declare namespace API {
     introduction?: string;
     category?: string;
     tags?: string[];
+    spaceId?: number;
   };
 
   type PictureUploadRequest = {
     id?: number;
     fileUrl?: string;
+    spaceId?: number;
   };
 
   type PictureVO = {
@@ -372,6 +417,72 @@ declare namespace API {
     picHeight?: number;
     picScale?: number;
     picFormat?: string;
+    userId?: number;
+    createTime?: string;
+    editTime?: string;
+    updateTime?: string;
+    spaceId?: number;
+    user?: UserVO;
+  };
+
+  type Space = {
+    id?: number;
+    spaceName?: string;
+    spaceLevel?: number;
+    maxSize?: number;
+    maxCount?: number;
+    totalSize?: number;
+    totalCount?: number;
+    userId?: number;
+    createTime?: string;
+    editTime?: string;
+    updateTime?: string;
+    isDelete?: number;
+  };
+
+  type SpaceAddRequest = {
+    spaceName?: string;
+    spaceLevel?: number;
+  };
+
+  type SpaceDeleteRequest = {
+    id?: number;
+  };
+
+  type SpaceLevel = {
+    value?: number;
+    text?: string;
+    maxCount?: number;
+    maxSize?: number;
+  };
+
+  type SpaceQueryRequest = {
+    currentPage?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    userId?: number;
+    spaceName?: string;
+    spaceLevel?: number;
+  };
+
+  type SpaceUpdateRequest = {
+    id?: number;
+    spaceName?: string;
+    spaceLevel?: number;
+    maxSize?: number;
+    maxCount?: number;
+  };
+
+  type SpaceVO = {
+    id?: number;
+    spaceName?: string;
+    spaceLevel?: number;
+    maxSize?: number;
+    maxCount?: number;
+    totalSize?: number;
+    totalCount?: number;
     userId?: number;
     createTime?: string;
     editTime?: string;

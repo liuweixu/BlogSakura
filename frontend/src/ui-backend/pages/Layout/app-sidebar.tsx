@@ -13,7 +13,7 @@ import {
   AppstoreOutlined,
   PictureOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Menu, Popconfirm, theme } from "antd";
+import { Button, Layout, Menu, message, Popconfirm, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { sessionLoginUser, logoutUser } from "@/api/userController";
 const { Header, Sider, Content } = Layout;
@@ -46,7 +46,13 @@ const App: React.FC = () => {
   //处理未登录时，同样后端界面的情况
   const getIsLogin = async () => {
     const res = await sessionLoginUser();
-    setIsLogin(res?.data.message !== "未登录");
+    if (
+      res?.data.code === 0 &&
+      res?.data.data &&
+      res.data.data.userRole === "admin"
+    ) {
+      setIsLogin(true);
+    }
   };
   // const getUserInfo = async () => {
   //   const res = await getUserInfoAPI();
@@ -122,7 +128,7 @@ const App: React.FC = () => {
                 {
                   key: "/backend/picture",
                   icon: <PictureOutlined />,
-                  label: "个人图库管理",
+                  label: "图库管理",
                   children: [
                     {
                       key: "/backend/picture",
@@ -135,6 +141,25 @@ const App: React.FC = () => {
                       icon: <BarsOutlined />,
                       label: "图像列表",
                       onClick: () => navigate("/backend/picture/list"),
+                    },
+                  ],
+                },
+                {
+                  key: "/backend/space",
+                  icon: <PictureOutlined />,
+                  label: "空间管理",
+                  children: [
+                    {
+                      key: "/backend/space",
+                      icon: <UploadOutlined />,
+                      label: "创建空间",
+                      onClick: () => navigate("/backend/space"),
+                    },
+                    {
+                      key: "/backend/space/list",
+                      icon: <BarsOutlined />,
+                      label: "空间列表",
+                      onClick: () => navigate("/backend/space/list"),
                     },
                   ],
                 },

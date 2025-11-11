@@ -39,6 +39,7 @@ export const User = () => {
       dataIndex: "operation",
       render: (_, record) => (
         <Space size="middle">
+          <Button type="primary">修改</Button>
           <Button
             type="primary"
             danger
@@ -46,7 +47,6 @@ export const User = () => {
           >
             删除
           </Button>
-          <Button type="primary">修改</Button>
         </Space>
       ),
     },
