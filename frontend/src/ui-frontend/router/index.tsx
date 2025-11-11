@@ -49,6 +49,14 @@ export const RouterFrontend = () => {
           }
         />
         <Route
+          path="/personal_space"
+          element={
+            <Suspense fallback={"加载中"}>
+              <Pictures />
+            </Suspense>
+          }
+        />
+        <Route
           path="/picture/:id"
           element={
             <Suspense fallback={"加载中"}>

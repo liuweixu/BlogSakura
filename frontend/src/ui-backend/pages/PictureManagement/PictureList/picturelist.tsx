@@ -83,16 +83,16 @@ export const App = () => {
         <Space size="middle">
           <Button
             type="primary"
+            onClick={() => navigate(`/backend/picture?id=${record.id}`)}
+          >
+            修改
+          </Button>
+          <Button
+            type="primary"
             danger
             onClick={() => handleDelete(record.id ?? 0)}
           >
             删除
-          </Button>
-          <Button
-            type="primary"
-            onClick={() => navigate(`/backend/picture?id=${record.id}`)}
-          >
-            修改
           </Button>
         </Space>
       ),

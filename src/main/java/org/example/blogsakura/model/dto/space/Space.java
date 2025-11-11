@@ -1,4 +1,4 @@
-package org.example.blogsakura.model.dto.picture;
+package org.example.blogsakura.model.dto.space;
 
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
@@ -17,7 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 图片管理 实体类。
+ * 空间 实体类。
  *
  * @author <a href="https://github.com/liuweixu">liuweixu</a>
  */
@@ -25,8 +25,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("picture")
-public class Picture implements Serializable {
+@Table("space")
+public class Space implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -38,60 +38,44 @@ public class Picture implements Serializable {
     private Long id;
 
     /**
-     * 图片 url
+     * 空间名称
      */
-    private String url;
+    @Column("spaceName")
+    private String spaceName;
 
     /**
-     * 图片名称
+     * 空间级别：0-普通版 1-专业版 2-旗舰版
      */
-    private String name;
+    @Column("spaceLevel")
+    private Integer spaceLevel;
 
     /**
-     * 简介
+     * 空间图片的最大总大小
      */
-    private String introduction;
+    @Column("maxSize")
+    private Long maxSize;
 
     /**
-     * 分类
+     * 空间图片的最大数量
      */
-    private String category;
+    @Column("maxCount")
+    private Long maxCount;
 
     /**
-     * 标签（JSON 数组）
+     * 当前空间下图片的总大小
      */
-    private String tags;
+    @Column("totalSize")
+    private Long totalSize;
 
     /**
-     * 图片体积
+     * 当前空间下的图片数量
      */
-    @Column("picSize")
-    private Long picSize;
+    @Column("totalCount")
+    private Long totalCount;
 
     /**
-     * 图片宽度
+     * 创建用户 id
      */
-    @Column("picWidth")
-    private Integer picWidth;
-
-    /**
-     * 图片高度
-     */
-    @Column("picHeight")
-    private Integer picHeight;
-
-    /**
-     * 图片宽高比例
-     */
-    @Column("picScale")
-    private Double picScale;
-
-    /**
-     * 图片格式
-     */
-    @Column("picFormat")
-    private String picFormat;
-
     @Column("userId")
     private Long userId;
 
@@ -112,12 +96,6 @@ public class Picture implements Serializable {
      */
     @Column("updateTime")
     private LocalDateTime updateTime;
-
-    /**
-     * 空间id，默认为空时表示公共空间
-     */
-    @Column("spaceId")
-    private Long spaceId;
 
     /**
      * 是否删除

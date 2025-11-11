@@ -1,9 +1,12 @@
 package org.example.blogsakura.controller.frontend;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.ResultUtils;
 import org.example.blogsakura.common.exception.BusinessException;
@@ -18,19 +21,26 @@ import org.example.blogsakura.service.PictureService;
 import org.example.blogsakura.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/picture")
+@Slf4j
 public class PictureFrontendController {
 
     @Resource
     private PictureService pictureService;
-    @Autowired
+    @Resource
     private UserService userService;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 前端根据主键获取图片。
@@ -65,6 +75,41 @@ public class PictureFrontendController {
         Page<Picture> picturePage = pictureService.page(Page.of(currentPage, pageSize),
                 pictureService.getQueryWrapper(pictureQueryRequest));
         return ResultUtils.success(pictureService.getPictureVOPage(picturePage, request));
+    }
+
+    @PostMapping("/list/page/vo/cache")
+    public BaseResponse<Page<PictureVO>> getFrontendPictureVOListByPageWithCache(
+            @RequestBody PictureQueryRequest pictureQueryRequest,
+            HttpServletRequest request
+    ) {
+        long currentPage = pictureQueryRequest.getCurrentPage();
+        long pageSize = pictureQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(pageSize > 20, ErrorCode.PARAMS_ERROR);
+        // 构建缓存key
+        String queryCondition = JSONUtil.toJsonStr(pictureQueryRequest);
+        String hashKey = DigestUtils.md5DigestAsHex(queryCondition.getBytes());
+        String redisKey = "personal_picture:getPictureVOByPage:" + hashKey;
+        // 从Redis缓存中查询
+        ValueOperations<String, String> stringStringValueOperations = stringRedisTemplate.opsForValue();
+        String cacheValue = stringStringValueOperations.get(redisKey);
+        if (cacheValue != null) {
+            // 缓存命中
+            log.info("缓存命中");
+            Page<PictureVO> cachePage = JSONUtil.toBean(cacheValue, Page.class);
+            return ResultUtils.success(cachePage);
+        }
+        // 查询数据库
+        Page<Picture> picturePage = pictureService.page(Page.of(currentPage, pageSize),
+                pictureService.getQueryWrapper(pictureQueryRequest));
+        // 获取封装类
+        Page<PictureVO> pictureVOPage = pictureService.getPictureVOPage(picturePage, request);
+
+        // 存入Redis缓存
+        cacheValue = JSONUtil.toJsonStr(pictureVOPage);
+        int cacheExpireTime = 300 + RandomUtil.randomInt(0, 30);
+        stringStringValueOperations.set(redisKey, cacheValue, cacheExpireTime, TimeUnit.SECONDS);
+        return ResultUtils.success(pictureVOPage);
     }
 
     /**
@@ -102,4 +147,6 @@ public class PictureFrontendController {
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
+
+
 }
