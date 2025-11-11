@@ -87,7 +87,7 @@ public class CosManager {
             return null;
         }
     }
-    
+
 
     /**
      * 个人图库部分，上传图片到COS，返回图片的具体信息.
@@ -107,6 +107,7 @@ public class CosManager {
 //        String date = nowTime.getYear() + "/" + nowTime.getMonthValue() + "/" + nowTime.getDayOfMonth() + "/";
         String uploadFilename = uploadPathPrefix + "/" + uuid +
                 "." + pictureMessage.getFormatName(file);
+        log.info("文件名: {}", FileUtil.mainName(originalFileName));
         try {
             UploadPictureResult uploadPictureResult = pictureMessage.getPicture(file);
             String url = this.uploadFileWithoutLocal(file, uploadFilename);

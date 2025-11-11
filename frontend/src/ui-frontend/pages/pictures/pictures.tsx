@@ -2,12 +2,14 @@ import { useEffect, useState, useRef } from "react";
 import { getFrontendPictureVoListByPage } from "@/api/pictureFrontendController";
 import Masonry from "react-masonry-css";
 import "./masonry.css";
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [data, setData] = useState<API.PictureVO[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const loadingRef = useRef(false);
+  const navigate = useNavigate();
 
   const pageSize = 12;
 
@@ -111,6 +113,9 @@ function App() {
                 src={item.url ?? ""}
                 alt={item.name ?? ""}
                 style={{ width: "100%", display: "block" }}
+                onClick={() => {
+                  navigate(`/picture/${item.id}`);
+                }}
               />
             </div>
           );

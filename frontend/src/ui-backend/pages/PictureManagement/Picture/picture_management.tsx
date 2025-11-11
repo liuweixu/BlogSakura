@@ -44,6 +44,7 @@ export function PictureManagement() {
   const [pictureId, setPictureId] = useState<number | undefined>(undefined);
   const [searchParams] = useSearchParams();
   const searchParamsId = searchParams.get("id");
+  const [title, setTitle] = useState<string>("");
   const navigate = useNavigate();
 
   const handlePreview = async (file: UploadFile) => {
@@ -109,9 +110,14 @@ export function PictureManagement() {
       );
 
       // 根据后端返回的数据结构调整
-      const pictureResponse = response?.data?.data ?? "";
+      const pictureResponse = response?.data?.data as API.PictureVO;
       setPicData(pictureResponse as API.PictureVO);
       setPictureId(pictureResponse?.id ?? 0);
+      setTitle(pictureResponse?.name ?? "");
+      form.setFieldsValue({
+        title: pictureResponse?.name ?? "",
+      });
+      console.log("form.getFieldValue('title')", form.getFieldValue("title"));
       // 更新文件列表，添加响应信息
       setFileList((prevList: UploadFile[]) => {
         return prevList.map((item) => {

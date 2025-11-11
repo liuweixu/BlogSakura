@@ -21,22 +21,28 @@ export const App = () => {
       render: (text) => <img src={text} width={160} height={120} alt="图片" />,
     },
     {
-      title: "图片简介",
-      dataIndex: "introduction",
-      key: "introduction",
-      width: 300,
+      title: "图片名称",
+      dataIndex: "name",
+      key: "name",
+      width: 160,
     },
+    // {
+    //   title: "图片简介",
+    //   dataIndex: "introduction",
+    //   key: "introduction",
+    //   width: 80,
+    // },
     {
       title: "图片类别",
       dataIndex: "category",
       key: "category",
-      // width: 80,
+      width: 80,
     },
     {
       title: "图片标签",
       dataIndex: "tags",
       key: "tags",
-      // width: 180,
+      width: 180,
     },
     {
       title: "图片信息",
@@ -57,12 +63,13 @@ export const App = () => {
       title: "用户id",
       dataIndex: "userId",
       key: "userId",
-      width: 120,
+      width: 40,
     },
     {
       title: "创建时间",
       dataIndex: "createTime",
       key: "createTime",
+      width: 80,
       render: (text) => {
         return new Date(text).toLocaleString();
       },
@@ -71,6 +78,7 @@ export const App = () => {
       title: "编辑时间",
       dataIndex: "editTime",
       key: "editTime",
+      width: 80,
       render: (text) => {
         return new Date(text).toLocaleString();
       },
