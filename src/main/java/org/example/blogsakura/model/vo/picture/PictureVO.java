@@ -93,6 +93,11 @@ public class PictureVO implements Serializable {
     private LocalDateTime updateTime;
 
     /**
+     * 私有空间id，id为null表示公共图库
+     */
+    private Long spaceId;
+
+    /**
      * 创建用户信息
      */
     private UserVO user;

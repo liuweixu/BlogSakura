@@ -14,10 +14,12 @@ import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
 import org.example.blogsakura.model.dto.picture.*;
+import org.example.blogsakura.model.dto.space.Space;
 import org.example.blogsakura.model.dto.user.User;
 import org.example.blogsakura.model.enums.UserRoleEnum;
 import org.example.blogsakura.model.vo.picture.PictureVO;
 import org.example.blogsakura.service.ArticleService;
+import org.example.blogsakura.service.SpaceService;
 import org.example.blogsakura.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +47,8 @@ public class PictureController {
 
     @Resource
     private UserService userService;
+    @Autowired
+    private SpaceService spaceService;
 
     /**
      * 保存图片。
@@ -97,8 +101,8 @@ public class PictureController {
         // 校验
         pictureService.validPicture(picture);
         // 更新图像前，判断id是否存在
-        Long id = pictureUpdateRequest.getId();
-        Picture oldPicture = pictureService.getById(id);
+        Long pictureId = pictureUpdateRequest.getId();
+        Picture oldPicture = pictureService.getById(pictureId);
         if (oldPicture == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "图片不存在");
         }

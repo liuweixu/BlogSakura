@@ -17,10 +17,12 @@ import org.example.blogsakura.mapper.PictureMapper;
 import org.example.blogsakura.model.dto.picture.PictureQueryRequest;
 import org.example.blogsakura.model.dto.picture.PictureUploadRequest;
 import org.example.blogsakura.model.dto.picture.UploadPictureResult;
+import org.example.blogsakura.model.dto.space.Space;
 import org.example.blogsakura.model.dto.user.User;
 import org.example.blogsakura.model.vo.picture.PictureVO;
 import org.example.blogsakura.model.vo.user.UserVO;
 import org.example.blogsakura.service.PictureService;
+import org.example.blogsakura.service.SpaceService;
 import org.example.blogsakura.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,11 +47,13 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     private final CosManager cosManager;
     private final UserService userService;
     private final PictureMapper pictureMapper;
+    private final SpaceService spaceService;
 
-    public PictureServiceImpl(CosManager cosManager, UserService userService, PictureMapper pictureMapper) {
+    public PictureServiceImpl(CosManager cosManager, UserService userService, PictureMapper pictureMapper, SpaceService spaceService) {
         this.cosManager = cosManager;
         this.userService = userService;
         this.pictureMapper = pictureMapper;
+        this.spaceService = spaceService;
     }
 
     @Override
@@ -138,6 +142,15 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         if (pictureId != null) {
             boolean exist = this.query().eq(Picture::getId, pictureId).hasCondition();
             ThrowUtils.throwIf(!exist, ErrorCode.PARAMS_ERROR);
+        }
+        // 校验空间是否存在
+        Long spaceId = pictureUploadRequest.getSpaceId();
+        if (spaceId != null) {
+            Space space = spaceService.getById(spaceId);
+            ThrowUtils.throwIf(space == null, ErrorCode.PARAMS_ERROR, "空间不存在");
+            if (!loginUser.getId().equals(space.getUserId())) {
+                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间权限");
+            }
         }
         // 上传图片得到信息
         String uploadPathPrefix = "/personal_pictures";

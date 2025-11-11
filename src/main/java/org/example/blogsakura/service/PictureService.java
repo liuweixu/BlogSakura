@@ -80,4 +80,6 @@ public interface PictureService extends IService<Picture> {
      * @return
      */
     boolean deleteDeepPicture(Long id);
+
+
 }
