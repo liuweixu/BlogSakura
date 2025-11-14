@@ -24,6 +24,7 @@ function App() {
   const params = useParams();
   const id = params.id;
   const getPictureInfo = async () => {
+    console.log(id);
     const res = await getFrontendPictureVoById({ id: id });
     if (res.data.code !== 0 || !res.data.data) {
       // 判断id是否存在，如果不存在就跳转到404页面

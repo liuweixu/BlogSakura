@@ -73,12 +73,12 @@ public class PictureFrontendController {
         ThrowUtils.throwIf(pageSize > 20, ErrorCode.PARAMS_ERROR);
         // 空间校验
         Long spaceId = pictureQueryRequest.getSpaceId();
-        // 查询空间类型
-        Integer spaceType = spaceService.getById(spaceId).getSpaceType();
         // 查询公开图库
         if (spaceId == null) {
             pictureQueryRequest.setNullSpaceId(true);
         } else {
+            // 查询空间类型
+            Integer spaceType = spaceService.getById(spaceId).getSpaceType();
             // 私有空间
             User loginUser = userService.sessionLoginUser(request);
             Space space = spaceService.getById(spaceId);
@@ -195,6 +195,7 @@ public class PictureFrontendController {
     @GetMapping("/{id}")
     public BaseResponse<PictureVO> getFrontendPictureVOById(@PathVariable Long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+        log.info("测试id:{}", id);
         Picture picture = pictureService.getById(id);
         if (picture == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "图片id不存在");

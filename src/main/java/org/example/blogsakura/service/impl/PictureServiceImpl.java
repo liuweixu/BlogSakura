@@ -370,8 +370,10 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
             }
         } else {
+            Space space = spaceService.getById(spaceId);
+            Integer spaceType = space.getSpaceType();
             // 私有空间，仅空间管理员可操作
-            if (!picture.getUserId().equals(loginUser.getId())) {
+            if (spaceType == 0 && !picture.getUserId().equals(loginUser.getId())) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
             }
         }

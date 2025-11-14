@@ -116,14 +116,6 @@ export const RouterFrontend = () => {
           }
         />
         <Route
-          path="/picture/:id"
-          element={
-            <Suspense fallback={"加载中"}>
-              <PictureInfo />
-            </Suspense>
-          }
-        />
-        <Route
           path="*"
           element={
             <Suspense fallback={"加载中"}>

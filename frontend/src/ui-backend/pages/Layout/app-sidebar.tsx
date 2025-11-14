@@ -12,6 +12,8 @@ import {
   DockerOutlined,
   AppstoreOutlined,
   PictureOutlined,
+  InboxOutlined,
+  DropboxOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, message, Popconfirm, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -150,12 +152,12 @@ const App: React.FC = () => {
                 },
                 {
                   key: "/backend/space",
-                  icon: <PictureOutlined />,
+                  icon: <InboxOutlined />,
                   label: "空间管理",
                   children: [
                     {
                       key: "/backend/space",
-                      icon: <UploadOutlined />,
+                      icon: <DropboxOutlined />,
                       label: "创建空间",
                       onClick: () => navigate("/backend/space"),
                     },

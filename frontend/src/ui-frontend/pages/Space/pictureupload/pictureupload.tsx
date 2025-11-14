@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import {
   AutoComplete,
-  Breadcrumb,
   Button,
   Form,
   Input,
@@ -18,14 +17,14 @@ import {
   getPictureListTagCategory,
   getPictureVoById,
   getUploadPicture,
-  getUploadPictureByUrl,
-  updatePicture,
 } from "@/api/pictureController";
 import "./picture.css";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getSpaceVoListByPage } from "@/api/spaceController";
 import { sessionLoginUser } from "@/api/userController";
 import { editFrontendPicture } from "@/api/pictureFrontendController";
+import CropModal from "./cropModal";
+import type { CropModalRef } from "./cropModal";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -41,17 +40,16 @@ function App() {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [form] = Form.useForm();
   //提交成功提示
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [notify, contextHolder] = notification.useNotification();
   const [picData, setPicData] = useState<API.PictureVO>({});
   const [pictureId, setPictureId] = useState<number | undefined>(undefined);
   const [spaceType, setSpaceType] = useState<number | undefined>(undefined);
   const [searchParams] = useSearchParams();
   const searchParamsId = searchParams.get("id");
-  const [title, setTitle] = useState<string>("");
   const [userId, setUserId] = useState<number | undefined>(undefined);
   const [spaceId, setSpaceId] = useState<number | undefined>(undefined);
   const navigate = useNavigate();
+  const cropModalRef = useRef<CropModalRef>(null);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -89,7 +87,8 @@ function App() {
   };
   useEffect(() => {
     getSpaceId();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) =>
     setFileList(newFileList);
@@ -141,7 +140,7 @@ function App() {
       const response = await getUploadPicture(
         {
           pictureUploadRequest: {
-            id: searchParamsId ?? "",
+            id: searchParamsId ? searchParamsId : undefined,
             spaceId: spaceId ?? undefined,
           },
         },
@@ -152,7 +151,6 @@ function App() {
       const pictureResponse = response?.data?.data as API.PictureVO;
       setPicData(pictureResponse as API.PictureVO);
       setPictureId(pictureResponse?.id ?? 0);
-      setTitle(pictureResponse?.name ?? "");
       form.setFieldsValue({
         title: pictureResponse?.name ?? "",
       });
@@ -198,24 +196,6 @@ function App() {
     }
   };
 
-  // Url上传图像
-  const handleUrlSearch = async (value: string) => {
-    const res = await getUploadPictureByUrl({ fileUrl: value });
-    if (res.data.code === 0 && res.data.data) {
-      setPicData(res.data.data as API.PictureVO);
-      setPictureId(res.data.data?.id ?? 0);
-      setFileList([
-        {
-          uid: "-1",
-          name: res.data.data.name ?? "",
-          status: "done",
-          url: res.data.data.url,
-          response: { Location: res.data.data.url },
-        },
-      ]);
-    }
-  };
-
   /**
    * 提交表单
    * @param values
@@ -228,7 +208,11 @@ function App() {
     pictureUpdateRequest.tags = tags ?? [];
     pictureUpdateRequest.name = title ?? "";
     pictureUpdateRequest.introduction = profile ?? "";
-    pictureUpdateRequest.id = pictureId ? pictureId : searchParamsId;
+    pictureUpdateRequest.id = pictureId
+      ? pictureId
+      : searchParamsId
+      ? searchParamsId
+      : undefined;
     pictureUpdateRequest.spaceId = spaceId;
     console.log("pictureUpdateRequest", pictureUpdateRequest);
     const res = await editFrontendPicture(pictureUpdateRequest);
@@ -248,9 +232,8 @@ function App() {
   //获取旧图像
   const getOldPicture = async () => {
     // 获取数据
-    const id = searchParamsId ?? "";
+    const id = searchParamsId;
     if (id) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const res = await getPictureVoById({ id: id });
       if (res.data.code === 0 && res.data.data) {
         form.setFieldsValue({
@@ -274,7 +257,8 @@ function App() {
 
   useEffect(() => {
     getOldPicture();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParamsId]);
 
   // 获取标签和分类选项
   const [tagList, setTagList] = useState<string[]>([]);
@@ -290,6 +274,77 @@ function App() {
   useEffect(() => {
     getTagCategoryOptions();
   }, []);
+
+  // 处理编辑图片
+  const handleEditPicture = () => {
+    const currentFile = fileList.find((file) => file.status === "done");
+    const currentPictureId =
+      pictureId || (searchParamsId ? Number(searchParamsId) : undefined);
+    if (currentFile?.url) {
+      cropModalRef.current?.open(currentFile.url, currentPictureId);
+    } else if (currentFile?.response?.imgUrl) {
+      cropModalRef.current?.open(currentFile.response.imgUrl, currentPictureId);
+    } else if (currentFile?.response?.Location) {
+      cropModalRef.current?.open(
+        currentFile.response.Location,
+        currentPictureId
+      );
+    }
+  };
+
+  // 处理编辑后的图片上传
+  const handleCropConfirm = async (blob: Blob) => {
+    try {
+      // 将 Blob 转换为 File
+      const file = new File([blob], "edited-image.png", { type: "image/png" });
+
+      // 创建 FormData
+      const formData = new FormData();
+      formData.append("image", file);
+
+      // 调用上传 API
+      const response = await getUploadPicture(
+        {
+          pictureUploadRequest: {
+            id: searchParamsId ? searchParamsId : undefined,
+            spaceId: spaceId ?? undefined,
+          },
+        },
+        formData
+      );
+
+      // 根据后端返回的数据结构调整
+      const pictureResponse = response?.data?.data as API.PictureVO;
+      setPicData(pictureResponse as API.PictureVO);
+      setPictureId(pictureResponse?.id ?? 0);
+
+      // 更新文件列表
+      setFileList([
+        {
+          uid: "-1",
+          name: pictureResponse?.name ?? "",
+          status: "done",
+          url: pictureResponse?.url,
+          response: { imgUrl: pictureResponse?.url ?? "" },
+        },
+      ]);
+
+      message.success("图片编辑并上传成功");
+    } catch {
+      notify.error({
+        message: "上传失败",
+        description: "编辑后的图片上传失败，请重试",
+        placement: "bottomRight",
+      });
+    }
+  };
+
+  // 检查是否有已上传的图片
+  const hasUploadedImage = fileList.some(
+    (file) =>
+      file.status === "done" &&
+      (file.url || file.response?.imgUrl || file.response?.Location)
+  );
 
   // Tabs部分信息
   const itemTabs: TabsProps["items"] = [
@@ -310,64 +365,13 @@ function App() {
             >
               {fileList.length >= 1 ? null : uploadButton}
             </Upload>
-          </Form.Item>
-          <Form.Item name="title" label="名称" layout="vertical">
-            <Input />
-          </Form.Item>
-          <Form.Item name="profile" label="简介" layout="vertical">
-            <Input.TextArea />
-          </Form.Item>
-          <Form.Item name="category" label="分类" layout="vertical">
-            <AutoComplete
-              options={categoryList.map((category) => ({
-                label: category,
-                value: category,
-              }))}
-            />
-          </Form.Item>
-          <Form.Item name="tags" label="标签" layout="vertical">
-            <Select
-              options={tagList.map((tag) => ({ label: tag, value: tag }))}
-              mode="tags"
-            />
-          </Form.Item>
-          <Form.Item className="flex flex-row justify-center items-center">
-            <Space>
-              <Button type="primary" htmlType="submit">
-                提交
-              </Button>
-              <Button htmlType="button" onClick={onReset}>
-                重置
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      ),
-    },
-    {
-      key: "url",
-      label: "URL上传",
-      children: (
-        <Form onFinish={onFinish} form={form}>
-          <Form.Item>
-            <Input.Search
-              placeholder="input search text"
-              onSearch={handleUrlSearch}
-              enterButton
-            />
-          </Form.Item>
-          <Form.Item name="picture" layout="vertical">
-            <Upload
-              action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={handlePreview}
-              onChange={handleChange}
-              beforeUpload={beforeUpload}
-              customRequest={customRequest}
-            >
-              {fileList.length >= 1 ? null : uploadButton}
-            </Upload>
+            {hasUploadedImage && (
+              <div style={{ marginTop: 16, textAlign: "center" }}>
+                <Button type="default" onClick={handleEditPicture}>
+                  编辑图片
+                </Button>
+              </div>
+            )}
           </Form.Item>
           <Form.Item name="title" label="名称" layout="vertical">
             <Input />
@@ -422,6 +426,7 @@ function App() {
         </div>
         <Tabs items={itemTabs} defaultActiveKey="file" />
       </div>
+      <CropModal ref={cropModalRef} onConfirm={handleCropConfirm} />
     </div>
   );
 }
