@@ -6,7 +6,6 @@ import { Suspense } from "react";
 const Error = lazy(() => import("@/components/error"));
 const Login = lazy(() => import("@/ui-backend/pages/Login"));
 const Layout = lazy(() => import("@/ui-backend/pages/Layout"));
-const Home = lazy(() => import("@/ui-backend/pages/Home"));
 const ArticleList = lazy(
   () => import("@/ui-backend/pages/ArticleManagement/ArticleList")
 );
@@ -27,6 +26,8 @@ const Space = lazy(() => import("@/ui-backend/pages/SpaceManagement/Space"));
 const SpaceList = lazy(
   () => import("@/ui-backend/pages/SpaceManagement/SpaceList")
 );
+
+const Home = lazy(() => import("@/ui-backend/pages/Home"));
 
 export const RouterBackend = () => {
   return (

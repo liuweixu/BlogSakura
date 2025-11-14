@@ -1,5 +1,6 @@
-import { Breadcrumb, Card } from "antd";
+import { Breadcrumb, Button, Card, Popconfirm, Space } from "antd";
 import { useEffect, useState } from "react";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 import { Table } from "antd";
 import { getChannelVoListByPage } from "@/api/channelController";
@@ -53,36 +54,35 @@ export const Channel = () => {
         return new Date(text).toLocaleString();
       },
     },
-    // {
-    //   title: "操作",
-    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //   render: (data: any) => {
-    //     return (
-    //       <Space size="middle">
-    //         <Button
-    //           type="primary"
-    //           shape="circle"
-    //           icon={<EditOutlined />}
-    //           onClick={() => navigate(`/backend/publish?id=${data.id}`)}
-    //         />
-    //         <Popconfirm
-    //           title="删除频道"
-    //           description="确认要删除当前频道吗?"
-    //           onConfirm={() => onConfirm(data)}
-    //           okText="Yes"
-    //           cancelText="No"
-    //         >
-    //           <Button
-    //             type="primary"
-    //             danger
-    //             shape="circle"
-    //             icon={<DeleteOutlined />}
-    //           />
-    //         </Popconfirm>
-    //       </Space>
-    //     );
-    //   },
-    // },
+    {
+      title: "操作",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      render: (data: any) => {
+        return (
+          <Space size="middle">
+            <Button
+              type="primary"
+              // shape="circle"
+              // icon={<EditOutlined />}
+              // onClick={() => navigate(`/backend/publish?id=${data.id}`)}
+            >
+              修改
+            </Button>
+            <Popconfirm
+              title="删除频道"
+              description="确认要删除当前频道吗?"
+              // onConfirm={() => onConfirm(data)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="primary" danger>
+                删除
+              </Button>
+            </Popconfirm>
+          </Space>
+        );
+      },
+    },
   ];
 
   // 处理分页变化

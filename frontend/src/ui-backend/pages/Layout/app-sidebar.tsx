@@ -15,7 +15,7 @@ import {
   InboxOutlined,
   DropboxOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, Menu, message, Popconfirm, theme } from "antd";
+import { Button, Layout, Menu, Popconfirm, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { sessionLoginUser, logoutUser } from "@/api/userController";
 const { Header, Sider, Content } = Layout;

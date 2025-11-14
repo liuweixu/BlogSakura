@@ -22,7 +22,7 @@ function App() {
       const params: API.PictureQueryRequest = {
         currentPage: 1,
         pageSize,
-        sortField: "id",
+        sortField: "createTime",
         sortOrder: "descend",
       };
 
