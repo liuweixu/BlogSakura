@@ -11,6 +11,7 @@ import org.example.blogsakura.common.annotation.AuthCheck;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.DeleteRequest;
 import org.example.blogsakura.common.common.ResultUtils;
+import org.example.blogsakura.common.constants.SpaceUserPermissionConstant;
 import org.example.blogsakura.common.constants.UserConstant;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
@@ -72,6 +73,8 @@ public class PictureFrontendController {
         ThrowUtils.throwIf(pageSize > 20, ErrorCode.PARAMS_ERROR);
         // 空间校验
         Long spaceId = pictureQueryRequest.getSpaceId();
+        // 查询空间类型
+        Integer spaceType = spaceService.getById(spaceId).getSpaceType();
         // 查询公开图库
         if (spaceId == null) {
             pictureQueryRequest.setNullSpaceId(true);
@@ -83,8 +86,8 @@ public class PictureFrontendController {
             log.info("loginUser.getId():{}", loginUser.getId());
             pictureQueryRequest.setNullSpaceId(false);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
-            if (!loginUser.getId().equals(space.getUserId())) {
-                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有空间权限");
+            if (spaceType == 0 && !loginUser.getId().equals(space.getUserId())) {
+                throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "没有私有空间权限");
             }
         }
         // 查询数据库

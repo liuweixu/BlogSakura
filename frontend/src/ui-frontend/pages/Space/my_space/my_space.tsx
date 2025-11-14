@@ -1,42 +1,63 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Form, List, Pagination, Progress, Tag } from "antd";
 import { getFrontendPictureVoListByPage } from "@/api/pictureFrontendController";
-import { getPictureListTagCategory } from "@/api/pictureController";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PlusOutlined } from "@ant-design/icons";
-import { getSpaceVoById } from "@/api/spaceController";
+import { getSpaceVoById, getSpaceVoListByUserId } from "@/api/spaceController";
+import { sessionLoginUser } from "@/api/userController";
 
 function App() {
   const [data, setData] = useState<API.PictureVO[]>([]);
   const [total, setTotal] = useState(0);
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [searchId] = useSearchParams();
-  const spaceId = searchId.get("id");
   const [progress, setProgress] = useState(0);
   const [spaceInfo, setSpaceInfo] = useState<API.SpaceVO>({});
-
+  const [searchParamsSpace] = useSearchParams();
+  const searchParamsSpaceId = searchParamsSpace.get("id");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchParams, setSearchParams] = useState<API.PictureQueryRequest>({
     currentPage: 1,
     pageSize: 12,
     sortField: "id",
     sortOrder: "descend",
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    spaceId: spaceId ? spaceId : undefined,
   });
+
   // 获取分页信息
   const getPictureVOList = async () => {
+    const resUser = await sessionLoginUser();
+    const userId = resUser?.data?.data?.id ?? undefined;
+    const resSpace = await getSpaceVoListByUserId({
+      userId: userId,
+      spaceType: 0,
+    });
+    if (resSpace.data.code === 0 && resSpace.data.data) {
+      searchParams.spaceId = searchParamsSpaceId
+        ? searchParamsSpaceId
+        : undefined;
+    }
     const res = await getFrontendPictureVoListByPage(searchParams);
     if (res.data.code !== 0 || !res.data.data) {
       return;
     }
     setData(res.data.data.records ?? []);
     setTotal(res.data.data.totalRow ?? 0);
+    const resProgress = await getSpaceVoById({ id: searchParamsSpaceId });
+    if (resProgress.data.code === 0 && resProgress.data.data) {
+      console.log(resProgress.data.data);
+      setSpaceInfo(resProgress.data.data);
+      const usedSize = resProgress.data.data?.totalSize ?? 0;
+      const totalSize = resProgress.data.data?.maxSize ?? 0;
+      const result = (usedSize / totalSize) * 100;
+      setProgress(Number(result.toFixed(2)));
+    } else {
+      setProgress(0);
+    }
   };
   useEffect(() => {
     getPictureVOList();
-  }, [searchParams.currentPage, searchParams.pageSize]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams.currentPage, searchParams.pageSize, searchParamsSpaceId]);
 
   // 处理分页信息
   const onPageChange = (page: number, pageSize: number) => {
@@ -45,37 +66,9 @@ function App() {
     getPictureVOList();
   };
 
-  // 分类和标签查询
-  const getCategoryTagsList = async () => {
-    const res = await getPictureListTagCategory();
-    if (res.data.code !== 0 || !res.data.data) {
-      return;
-    }
-  };
-
-  useEffect(() => {
-    getCategoryTagsList();
-  }, []);
-
-  // 计算进度条
-  const calculateProgress = async () => {
-    const res = await getSpaceVoById({ id: spaceId });
-    if (res.data.code === 0 && res.data.data) {
-      setSpaceInfo(res.data.data);
-      const usedSize = res.data.data?.totalSize ?? 0;
-      const totalSize = res.data.data?.maxSize ?? 0;
-      const result = (usedSize / totalSize) * 100;
-      setProgress(Number(result.toFixed(2)));
-    }
-  };
-
-  useEffect(() => {
-    calculateProgress();
-  }, []);
-
   return (
     <div className="mx-4">
-      {spaceId && (
+      {searchParamsSpaceId && (
         <div className="flex justify-end mb-4 gap-4 items-center">
           <span>
             <Button
@@ -150,7 +143,7 @@ function App() {
             showQuickJumper
             defaultCurrent={searchParams.currentPage}
             showTotal={
-              spaceId
+              searchParamsSpaceId
                 ? (total) =>
                     `图片总数 ${total} 张 / 总空间 ${spaceInfo.maxCount} 张`
                 : undefined

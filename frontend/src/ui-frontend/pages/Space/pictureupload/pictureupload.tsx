@@ -45,6 +45,7 @@ function App() {
   const [notify, contextHolder] = notification.useNotification();
   const [picData, setPicData] = useState<API.PictureVO>({});
   const [pictureId, setPictureId] = useState<number | undefined>(undefined);
+  const [spaceType, setSpaceType] = useState<number | undefined>(undefined);
   const [searchParams] = useSearchParams();
   const searchParamsId = searchParams.get("id");
   const [title, setTitle] = useState<string>("");
@@ -83,6 +84,7 @@ function App() {
     const records = res?.data?.data?.records ?? [];
     if (res?.data.code === 0 && res?.data.data) {
       setSpaceId(records[0]?.id ?? undefined);
+      setSpaceType(records[0]?.spaceType ?? undefined);
     }
   };
   useEffect(() => {
@@ -408,7 +410,13 @@ function App() {
       <div className="picture-upload">
         <div className="mb-4">
           保存图像到空间：
-          <Link to={`/personal_space/private_pictures?id=${spaceId}`}>
+          <Link
+            to={
+              spaceType === 0
+                ? `/personal_space/private_pictures?id=${spaceId}`
+                : `/personal_space/team_pictures?id=${spaceId}`
+            }
+          >
             {spaceId}
           </Link>
         </div>

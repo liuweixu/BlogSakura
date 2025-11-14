@@ -77,6 +77,18 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListSpaceUserVO = {
+    code?: number;
+    data?: SpaceUserVO[];
+    message?: string;
+  };
+
+  type BaseResponseListSpaceVO = {
+    code?: number;
+    data?: SpaceVO[];
+    message?: string;
+  };
+
   type BaseResponseLoginUserVO = {
     code?: number;
     data?: LoginUserVO;
@@ -125,9 +137,9 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponsePageSpace = {
+  type BaseResponsePageSpaceVO = {
     code?: number;
-    data?: PageSpace;
+    data?: PageSpaceVO;
     message?: string;
   };
 
@@ -146,6 +158,12 @@ declare namespace API {
   type BaseResponsePictureVO = {
     code?: number;
     data?: PictureVO;
+    message?: string;
+  };
+
+  type BaseResponseSpaceUser = {
+    code?: number;
+    data?: SpaceUser;
     message?: string;
   };
 
@@ -317,8 +335,8 @@ declare namespace API {
     optimizeCountQuery?: boolean;
   };
 
-  type PageSpace = {
-    records?: Space[];
+  type PageSpaceVO = {
+    records?: SpaceVO[];
     pageNumber?: number;
     pageSize?: number;
     totalPage?: number;
@@ -416,24 +434,16 @@ declare namespace API {
     user?: UserVO;
   };
 
-  type Space = {
-    id?: number;
-    spaceName?: string;
-    spaceLevel?: number;
-    maxSize?: number;
-    maxCount?: number;
-    totalSize?: number;
-    totalCount?: number;
-    userId?: number;
-    createTime?: string;
-    editTime?: string;
-    updateTime?: string;
-    isDelete?: number;
-  };
-
   type SpaceAddRequest = {
     spaceName?: string;
     spaceLevel?: number;
+    spaceType?: number;
+    userId?: number;
+  };
+
+  type SpaceByUserIdRequest = {
+    userId?: number;
+    spaceType?: number;
   };
 
   type SpaceDeleteRequest = {
@@ -456,6 +466,7 @@ declare namespace API {
     userId?: number;
     spaceName?: string;
     spaceLevel?: number;
+    spaceType?: number;
   };
 
   type SpaceUpdateRequest = {
@@ -464,6 +475,45 @@ declare namespace API {
     spaceLevel?: number;
     maxSize?: number;
     maxCount?: number;
+    spaceType?: number;
+  };
+
+  type SpaceUser = {
+    id?: number;
+    spaceId?: number;
+    userId?: number;
+    spaceRole?: string;
+    createTime?: string;
+    updateTime?: string;
+  };
+
+  type SpaceUserAddRequest = {
+    spaceId?: number;
+    userId?: number;
+    spaceRole?: string;
+  };
+
+  type SpaceUserEditRequest = {
+    id?: number;
+    spaceRole?: string;
+  };
+
+  type SpaceUserQueryRequest = {
+    id?: number;
+    spaceId?: number;
+    userId?: number;
+    spaceRole?: string;
+  };
+
+  type SpaceUserVO = {
+    id?: number;
+    spaceId?: number;
+    userId?: number;
+    spaceRole?: string;
+    createTime?: string;
+    updateTime?: string;
+    user?: UserVO;
+    space?: SpaceVO;
   };
 
   type SpaceVO = {
@@ -479,6 +529,7 @@ declare namespace API {
     editTime?: string;
     updateTime?: string;
     user?: UserVO;
+    spaceType?: number;
   };
 
   type updateViewsParams = {

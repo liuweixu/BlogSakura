@@ -2,6 +2,7 @@
 /* eslint-disable */
 // API 更新时间：
 // API 唯一标识：
+import * as spaceUserController from "./spaceUserController";
 import * as pictureFrontendController from "./pictureFrontendController";
 import * as userController from "./userController";
 import * as spaceController from "./spaceController";
@@ -14,6 +15,7 @@ import * as articleFrontendController from "./articleFrontendController";
 import * as healthController from "./healthController";
 import * as viewController from "./viewController";
 export default {
+  spaceUserController,
   pictureFrontendController,
   userController,
   spaceController,

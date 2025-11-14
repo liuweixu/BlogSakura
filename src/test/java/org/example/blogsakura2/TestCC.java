@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.BlogsakuraApplication;
 import org.example.blogsakura.manager.CosManager;
 import org.example.blogsakura.manager.PictureMessage;
+import org.example.blogsakura.manager.auth.SpaceUserAuthManager;
+import org.example.blogsakura.manager.auth.model.SpaceUserRole;
 import org.example.blogsakura.model.dto.picture.Picture;
 import org.example.blogsakura.model.dto.picture.UploadPictureResult;
 import org.example.blogsakura.model.vo.picture.PictureVO;
@@ -25,17 +27,12 @@ import java.time.LocalDateTime;
 @ContextConfiguration(classes = {BlogsakuraApplication.class})
 public class TestCC {
 
-
     @Resource
-    private PictureMessage pictureMessage;
-
-    @Resource
-    private CosManager cosManager;
+    private SpaceUserAuthManager spaceUserAuthManager;
 
     @Test
     void test() throws IOException {
-        String url = "https://www.codefather.cn/logo.png";
-        UploadPictureResult uploadPictureResult = cosManager.uploadPictureByUrl(url, "/test");
-        log.info("uploadPictureResult:{}", uploadPictureResult.toString());
+
+        log.info("spaceUserAuthManager:{}", spaceUserAuthManager.getPermissionsByRole("admin"));
     }
 }

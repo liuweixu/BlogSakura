@@ -103,4 +103,10 @@ public class Space implements Serializable {
     @Column(value = "isDelete", isLogicDelete = true)
     private Integer isDelete;
 
+    /**
+     * 空间类型 0:私有 1:团队
+     */
+    @Column("spaceType")
+    private Integer spaceType;
+
 }

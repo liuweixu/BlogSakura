@@ -16,7 +16,7 @@ import { useForm, type FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { message } from "antd";
-import { getSpaceVoListByPage } from "@/api/spaceController";
+import { getSpaceVoListByUserId } from "@/api/spaceController";
 
 export function LoginPage() {
   const form = useForm();
@@ -55,16 +55,12 @@ export function LoginPage() {
             });
           } else if (res.data.data && res.data.data.userRole === "user") {
             message.success("进入私有空间");
-            const resSpace = await getSpaceVoListByPage({
-              currentPage: 1,
-              pageSize: 1,
-              sortField: "id",
-              sortOrder: "descend",
+            const resSpace = await getSpaceVoListByUserId({
               userId: res.data.data.id,
+              spaceType: 0,
             });
-            const records = resSpace?.data?.data?.records ?? [];
             if (resSpace.data.code === 0 && resSpace.data.data) {
-              const spaceId = records[0]?.id ?? undefined;
+              const spaceId = resSpace?.data?.data[0]?.id ?? undefined;
               window.location.href =
                 "/personal_space/private_pictures?id=" + spaceId;
             } else {

@@ -47,6 +47,21 @@ export async function deleteSpace(
   });
 }
 
+/** 此处后端没有提供注释 POST /backend/space/list_user */
+export async function getSpaceVoListByUserId(
+  body: API.SpaceByUserIdRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseListSpaceVO>("/backend/space/list_user", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 此处后端没有提供注释 GET /backend/space/list/level */
 export async function getSpaceListLevel(options?: { [key: string]: any }) {
   return request<API.BaseResponseListSpaceLevel>("/backend/space/list/level", {
@@ -60,7 +75,7 @@ export async function getSpaceVoListByPage(
   body: API.SpaceQueryRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponsePageSpace>("/backend/space/list/page", {
+  return request<API.BaseResponsePageSpaceVO>("/backend/space/list/page", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

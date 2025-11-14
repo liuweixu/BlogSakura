@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 function App() {
   const [form] = Form.useForm();
-  const [spaceList, setSpaceList] = useState<API.Space[]>([]);
+  const [spaceList, setSpaceList] = useState<API.SpaceVO[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchParams, setSearchParams] = useState<API.SpaceQueryRequest>({
     currentPage: 1,
@@ -23,7 +23,7 @@ function App() {
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
 
-  const columns: TableProps<API.Space>["columns"] = [
+  const columns: TableProps<API.SpaceVO>["columns"] = [
     {
       title: "id",
       dataIndex: "id",
@@ -65,6 +65,9 @@ function App() {
       title: "总容量",
       dataIndex: "totalSize",
       key: "totalSize",
+      render: (text) => {
+        return text ? (text / 1024 / 1024).toFixed(2) + " MB" : 0;
+      },
     },
     {
       title: "总数量",
@@ -72,9 +75,12 @@ function App() {
       key: "totalCount",
     },
     {
-      title: "用户id",
-      dataIndex: "userId",
-      key: "userId",
+      title: "用户",
+      dataIndex: "user",
+      key: "userName",
+      render: (text) => {
+        return text?.userName ?? "未分配";
+      },
     },
     {
       title: "创建时间",
@@ -90,6 +96,14 @@ function App() {
       key: "editTime",
       render: (text) => {
         return new Date(text).toLocaleString();
+      },
+    },
+    {
+      title: "空间类型",
+      dataIndex: "spaceType",
+      key: "spaceType",
+      render: (text) => {
+        return text === 0 ? "私有空间" : text === 1 ? "团队空间" : "未知";
       },
     },
     {
@@ -130,13 +144,14 @@ function App() {
   const getSpaceList = async () => {
     const resSpaceList = await getSpaceVoListByPage(searchParams);
     const records = resSpaceList?.data?.data?.records ?? [];
+    console.log(records);
     setSpaceList(records);
     const newTotal = resSpaceList?.data?.data?.totalRow ?? 0;
     setTotal(newTotal);
   };
   useEffect(() => {
     getSpaceList();
-  }, [searchParams.currentPage, searchParams.pageSize]);
+  }, [searchParams.currentPage, searchParams.pageSize, searchParams.spaceType]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSearch = (values: any) => {
     console.log(values);

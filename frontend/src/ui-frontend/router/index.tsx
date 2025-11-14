@@ -15,6 +15,10 @@ const MySpace = lazy(() => import("@/ui-frontend/pages/Space/my_space"));
 const PictureUpload = lazy(
   () => import("@/ui-frontend/pages/Space/pictureupload")
 );
+const TeamSpace = lazy(() => import("@/ui-frontend/pages/Space/team_space"));
+const TeamSpaceManagement = lazy(
+  () => import("@/ui-frontend/pages/Space/team_space_manage")
+);
 
 export const RouterFrontend = () => {
   const location = useLocation();
@@ -83,6 +87,22 @@ export const RouterFrontend = () => {
             element={
               <Suspense fallback={"加载中"}>
                 <PictureUpload />
+              </Suspense>
+            }
+          />
+          <Route
+            path="team_pictures"
+            element={
+              <Suspense fallback={"加载中"}>
+                <TeamSpace />
+              </Suspense>
+            }
+          />
+          <Route
+            path="team_pictures/:id"
+            element={
+              <Suspense fallback={"加载中"}>
+                <TeamSpaceManagement />
               </Suspense>
             }
           />

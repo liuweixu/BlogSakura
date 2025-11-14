@@ -9,10 +9,12 @@ import org.example.blogsakura.common.annotation.AuthCheck;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.DeleteRequest;
 import org.example.blogsakura.common.common.ResultUtils;
+import org.example.blogsakura.common.constants.SpaceUserPermissionConstant;
 import org.example.blogsakura.common.constants.UserConstant;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
+import org.example.blogsakura.manager.auth.model.SpaceUserPermission;
 import org.example.blogsakura.model.dto.picture.*;
 import org.example.blogsakura.model.dto.space.Space;
 import org.example.blogsakura.model.dto.user.User;
@@ -69,6 +71,7 @@ public class PictureController {
      */
     @DeleteMapping("/")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+//    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_DELETE)
     public BaseResponse<Boolean> deletePicture(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(deleteRequest == null, ErrorCode.PARAMS_ERROR);
         Long id = deleteRequest.getId();
@@ -170,6 +173,7 @@ public class PictureController {
      * @return
      */
     @PostMapping("/upload")
+//    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_UPLOAD)
     public BaseResponse<PictureVO> getUploadPicture(
             @RequestPart("image") MultipartFile multipartFile,
             PictureUploadRequest pictureUploadRequest,
@@ -189,6 +193,7 @@ public class PictureController {
      * @return
      */
     @PostMapping("/upload/url")
+//    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_UPLOAD)
     public BaseResponse<PictureVO> getUploadPictureByUrl(
             @RequestBody PictureUploadRequest pictureUploadRequest,
             HttpServletRequest request

@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { UserOutlined, PictureOutlined } from "@ant-design/icons";
+import { UserOutlined, PictureOutlined, TeamOutlined } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { sessionLoginUser } from "@/api/userController";
-import { getSpaceVoListByPage } from "@/api/spaceController";
+import { getSpaceVoListByUserId } from "@/api/spaceController";
+import { getMyTeamSpaceList } from "@/api/spaceUserController";
 const { Sider, Content } = Layout;
 
 const App: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [spaceId, setSpaceId] = useState<number | undefined>(undefined);
+  const [spaceListPrimary, setSpaceListPrimary] = useState<API.SpaceVO[]>([]);
+  const [spaceListTeam, setSpaceListTeam] = useState<API.SpaceUserVO[]>([]);
   //路由跳转
   const navigate = useNavigate();
   //高亮
@@ -25,21 +27,18 @@ const App: React.FC = () => {
   const getIsLogin = async () => {
     const res = await sessionLoginUser();
     setIsLogin(res?.data.message !== "未登录");
-    if (res?.data.data && res?.data.data.userRole === "user") {
-      const resSpace = await getSpaceVoListByPage({
-        currentPage: 1,
-        pageSize: 1,
-        sortField: "id",
-        sortOrder: "descend",
+    if (res?.data.data) {
+      const resSpacePrimary = await getSpaceVoListByUserId({
         userId: res.data.data.id,
+        spaceType: 0,
       });
-      const records = resSpace?.data?.data?.records ?? [];
-      if (resSpace.data.code === 0 && resSpace.data.data) {
-        const spaceId = records[0]?.id ?? undefined;
-        setSpaceId(spaceId);
+      if (resSpacePrimary.data.code === 0 && resSpacePrimary.data.data) {
+        setSpaceListPrimary(resSpacePrimary.data.data);
       }
-    } else {
-      setSpaceId(undefined);
+      const resSpaceTeam = await getMyTeamSpaceList();
+      if (resSpaceTeam.data.code === 0 && resSpaceTeam.data.data) {
+        setSpaceListTeam(resSpaceTeam.data.data);
+      }
     }
   };
   useEffect(() => {
@@ -53,6 +52,7 @@ const App: React.FC = () => {
             <Menu
               // defaultSelectedKeys={['1']}
               selectedKeys={[selectedKey]}
+              mode="inline"
               items={[
                 {
                   key: "/personal_space",
@@ -64,12 +64,33 @@ const App: React.FC = () => {
                   key: "/personal_space/private_pictures",
                   icon: <UserOutlined />,
                   label: "我的空间",
-                  onClick: () =>
-                    navigate(
-                      spaceId
-                        ? "/personal_space/private_pictures?id=" + spaceId
-                        : "/personal_space/private_pictures"
-                    ),
+                  children: spaceListPrimary.map((space) => {
+                    return {
+                      key: "/personal_space/private_pictures?id=" + space.id,
+                      icon: <UserOutlined />,
+                      label: space.spaceName,
+                      onClick: () =>
+                        navigate(
+                          "/personal_space/private_pictures?id=" + space.id
+                        ),
+                    };
+                  }),
+                },
+                {
+                  key: "/personal_space/team_pictures",
+                  icon: <TeamOutlined />,
+                  label: "团队空间",
+                  children: spaceListTeam.map((space) => {
+                    return {
+                      key: "/personal_space/team_pictures?id=" + space.id,
+                      icon: <TeamOutlined />,
+                      label: space.space?.spaceName,
+                      onClick: () =>
+                        navigate(
+                          "/personal_space/team_pictures?id=" + space.space?.id
+                        ),
+                    };
+                  }),
                 },
               ]}
             />

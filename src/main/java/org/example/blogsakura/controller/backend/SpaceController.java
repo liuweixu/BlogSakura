@@ -3,6 +3,7 @@ package org.example.blogsakura.controller.backend;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.annotation.AuthCheck;
 import org.example.blogsakura.common.common.BaseResponse;
 import org.example.blogsakura.common.common.ResultUtils;
@@ -10,12 +11,14 @@ import org.example.blogsakura.common.constants.UserConstant;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
+import org.example.blogsakura.mapper.SpaceMapper;
 import org.example.blogsakura.model.dto.space.*;
 import org.example.blogsakura.model.dto.user.User;
 import org.example.blogsakura.model.enums.SpaceLevelEnum;
 import org.example.blogsakura.model.vo.space.SpaceVO;
 import org.example.blogsakura.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.example.blogsakura.service.SpaceService;
 
@@ -31,6 +34,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/backend/space")
+@Slf4j
 public class SpaceController {
 
     @Resource
@@ -38,6 +42,8 @@ public class SpaceController {
 
     @Resource
     private UserService userService;
+    @Autowired
+    private SpaceMapper spaceMapper;
 
     /**
      * 创建空间（所有人都可以使用）。
@@ -48,17 +54,30 @@ public class SpaceController {
     @PostMapping("/")
     public BaseResponse<Boolean> addSpace(@RequestBody SpaceAddRequest spaceAddRequest,
                                           HttpServletRequest request) {
-        User loginUser = userService.sessionLoginUser(request);
-        long spaceId = spaceService.addSpace(spaceAddRequest, loginUser);
+//        User loginUser = userService.sessionLoginUser(request);
+        Long userId = spaceAddRequest.getUserId();
+        ThrowUtils.throwIf(userId == null || userId <= 0, ErrorCode.PARAMS_ERROR);
+        User user = userService.getById(userId);
+        long spaceId = spaceService.addSpace(spaceAddRequest, user);
         return ResultUtils.success(spaceId != -1L);
     }
 
+    /**
+     * 获取空间信息
+     *
+     * @param id
+     * @param request
+     * @return
+     */
     @GetMapping("/")
     public BaseResponse<SpaceVO> getSpaceVOById(@RequestParam Long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null, ErrorCode.PARAMS_ERROR);
-        return ResultUtils.success(SpaceVO.objToVo(space));
+        SpaceVO spaceVO = SpaceVO.objToVo(space);
+        User user = userService.getById(space.getUserId());
+        spaceVO.setUser(userService.getUserVO(user));
+        return ResultUtils.success(spaceVO);
     }
 
 
@@ -78,12 +97,23 @@ public class SpaceController {
         return ResultUtils.success(spaceService.removeById(space));
     }
 
+    /**
+     * 获取封装后的空间列表信息
+     *
+     * @param spaceQueryRequest
+     * @param request
+     * @return
+     */
     @PostMapping("list/page")
-    public BaseResponse<Page<Space>> getSpaceVOListByPage(@RequestBody SpaceQueryRequest spaceQueryRequest) {
+    public BaseResponse<Page<SpaceVO>> getSpaceVOListByPage(@RequestBody SpaceQueryRequest spaceQueryRequest,
+                                                            HttpServletRequest request) {
         ThrowUtils.throwIf(spaceQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long currentPage = spaceQueryRequest.getCurrentPage();
         long pageSize = spaceQueryRequest.getPageSize();
-        return ResultUtils.success(spaceService.page(Page.of(currentPage, pageSize)));
+        Page<Space> spacePage = spaceService.page(Page.of(currentPage, pageSize),
+                spaceService.getQueryWrapper(spaceQueryRequest));
+        Page<SpaceVO> spaceVOPage = spaceService.getPictureVOPage(spacePage, request);
+        return ResultUtils.success(spaceVOPage);
     }
 
 
@@ -96,6 +126,7 @@ public class SpaceController {
     @PutMapping("update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateSpace(@RequestBody SpaceUpdateRequest spaceUpdateRequest) {
+        log.info("spaceUpdateRequest:{}", spaceUpdateRequest);
         ThrowUtils.throwIf(spaceUpdateRequest == null || spaceUpdateRequest.getId() <= 0,
                 ErrorCode.PARAMS_ERROR);
         Space space = new Space();
@@ -129,5 +160,19 @@ public class SpaceController {
         return ResultUtils.success(spaceLevelList);
     }
 
-
+    /**
+     * 从用户id获取相应的空间列表信息
+     *
+     * @param spaceByUserIdRequest
+     * @return
+     */
+    @PostMapping("/list_user")
+    public BaseResponse<List<SpaceVO>> getSpaceVOListByUserId(@RequestBody SpaceByUserIdRequest spaceByUserIdRequest) {
+        ThrowUtils.throwIf(spaceByUserIdRequest == null, ErrorCode.PARAMS_ERROR);
+        Long userId = spaceByUserIdRequest.getUserId();
+        ThrowUtils.throwIf(userId == null || userId <= 0, ErrorCode.PARAMS_ERROR);
+        Integer spaceType = spaceByUserIdRequest.getSpaceType();
+        ThrowUtils.throwIf(spaceType != 0 && spaceType != 1, ErrorCode.PARAMS_ERROR);
+        return ResultUtils.success(spaceService.getSpaceVOListByUserId(userId, spaceType));
+    }
 }

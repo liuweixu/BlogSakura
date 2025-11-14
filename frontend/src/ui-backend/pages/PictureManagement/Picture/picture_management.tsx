@@ -23,6 +23,7 @@ import {
 } from "@/api/pictureController";
 import "./picture.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import "react-image-crop/dist/ReactCrop.css";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -44,7 +45,6 @@ export function PictureManagement() {
   const [pictureId, setPictureId] = useState<number | undefined>(undefined);
   const [searchParams] = useSearchParams();
   const searchParamsId = searchParams.get("id");
-  const [title, setTitle] = useState<string>("");
   const navigate = useNavigate();
 
   const handlePreview = async (file: UploadFile) => {
@@ -113,7 +113,6 @@ export function PictureManagement() {
       const pictureResponse = response?.data?.data as API.PictureVO;
       setPicData(pictureResponse as API.PictureVO);
       setPictureId(pictureResponse?.id ?? 0);
-      setTitle(pictureResponse?.name ?? "");
       form.setFieldsValue({
         title: pictureResponse?.name ?? "",
       });
