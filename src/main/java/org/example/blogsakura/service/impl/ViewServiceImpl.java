@@ -3,7 +3,7 @@ package org.example.blogsakura.service.impl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.constants.RabbitMQConstants;
-import org.example.blogsakura.manager.ArticleBloomFilter;
+import org.example.blogsakura.manager.BloomFilter.ArticleBloomFilter;
 import org.example.blogsakura.mapper.ArticleMapper;
 import org.example.blogsakura.service.ViewService;
 import org.redisson.api.RLock;

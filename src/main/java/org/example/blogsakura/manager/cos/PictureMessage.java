@@ -1,19 +1,14 @@
-package org.example.blogsakura.manager;
+package org.example.blogsakura.manager.cos;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.blogsakura.model.dto.picture.Picture;
 import org.example.blogsakura.model.dto.picture.UploadPictureResult;
-import org.example.blogsakura.model.vo.picture.PictureVO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 @Component
 @Slf4j

@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -14,7 +15,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
-import org.example.blogsakura.manager.CosManager;
+import org.example.blogsakura.manager.cos.CosManager;
+import org.example.blogsakura.manager.upload.FilePictureUpload;
+import org.example.blogsakura.manager.upload.PictureUploadTemplate;
+import org.example.blogsakura.manager.upload.UrlPictureUpload;
 import org.example.blogsakura.mapper.SpaceMapper;
 import org.example.blogsakura.model.dto.picture.*;
 import org.example.blogsakura.mapper.PictureMapper;
@@ -44,22 +48,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> implements PictureService {
 
-    private final CosManager cosManager;
-    private final UserService userService;
-    private final PictureMapper pictureMapper;
-    private final SpaceService spaceService;
-    private final TransactionTemplate transactionTemplate;
+    @Resource
+    private CosManager cosManager;
+    @Resource
+    private UserService userService;
+    @Resource
+    private PictureMapper pictureMapper;
+    @Resource
+    private SpaceService spaceService;
+    @Resource
+    private TransactionTemplate transactionTemplate;
+    @Resource
     private SpaceMapper spaceMapper;
-
-    public PictureServiceImpl(CosManager cosManager, UserService userService, PictureMapper pictureMapper,
-                              SpaceService spaceService, TransactionTemplate transactionTemplate, SpaceMapper spaceMapper) {
-        this.cosManager = cosManager;
-        this.userService = userService;
-        this.pictureMapper = pictureMapper;
-        this.spaceService = spaceService;
-        this.transactionTemplate = transactionTemplate;
-        this.spaceMapper = spaceMapper;
-    }
+    @Resource
+    private FilePictureUpload filePictureUpload;
+    @Resource
+    private UrlPictureUpload urlPictureUpload;
 
     /**
      * 构建查询条件
@@ -183,12 +187,17 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
             uploadPathPrefix = String.format("/space_pictures/%s", spaceId);
         }
 
-        UploadPictureResult uploadPictureResult = null;
-        if (inputSource instanceof MultipartFile) {
-            uploadPictureResult = cosManager.uploadPicture((MultipartFile) inputSource, uploadPathPrefix);
-        } else {
-            uploadPictureResult = cosManager.uploadPictureByUrl((String) inputSource, uploadPathPrefix);
+//        UploadPictureResult uploadPictureResult = null;
+//        if (inputSource instanceof MultipartFile) {
+//            uploadPictureResult = cosManager.uploadPicture((MultipartFile) inputSource, uploadPathPrefix);
+//        } else {
+//            uploadPictureResult = cosManager.uploadPictureByUrl((String) inputSource, uploadPathPrefix);
+//        }
+        PictureUploadTemplate pictureUploadTemplate = filePictureUpload;
+        if (inputSource instanceof String) {
+            pictureUploadTemplate = urlPictureUpload;
         }
+        UploadPictureResult uploadPictureResult = pictureUploadTemplate.uploadPicture(inputSource, uploadPathPrefix);
         picture.setPicHeight(uploadPictureResult.getPicHeight());
         picture.setPicWidth(uploadPictureResult.getPicWidth());
         picture.setPicFormat(uploadPictureResult.getPicFormat());

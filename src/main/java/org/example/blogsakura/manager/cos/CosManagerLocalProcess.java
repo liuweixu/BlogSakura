@@ -1,4 +1,4 @@
-package org.example.blogsakura.manager;
+package org.example.blogsakura.manager.cos;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
@@ -7,39 +7,32 @@ import cn.hutool.http.HttpStatus;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.demo.PicOperationDemo;
-import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
-import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
-import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.client.ml.inference.preprocessing.Multi;
 import org.example.blogsakura.common.configuration.CosClientConfig;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
 import org.example.blogsakura.model.dto.picture.UploadPictureResult;
-import org.example.blogsakura.model.vo.picture.PictureVO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Component
 @Slf4j
-public class CosManager {
+public class CosManagerLocalProcess {
 
     @Resource
     private CosClientConfig cosClientConfig;
@@ -50,28 +43,18 @@ public class CosManager {
     @Resource
     private PictureMessage pictureMessage;
 
+    @Resource
+    private CosManager cosManager;
 
     /**
-     * 上传对象
-     *
-     * @param key  唯一键
-     * @param file 文件
-     */
-    public PutObjectResult putObject(String key, File file) {
-        PutObjectRequest putObjectRequest = new PutObjectRequest(cosClientConfig.getBucket(), key,
-                file);
-        return cosClient.putObject(putObjectRequest);
-    }
-
-    /**
-     * 通用文件上传到COS并返回访问URL 需要数据万象处理
+     * 通用文件上传到COS并返回访问URL（非云图部分）
      *
      * @param file
      * @param key  cos的对象键，即图片的存储路径
      * @return
      * @throws IOException
      */
-    public PutObjectResult uploadFileWithoutLocal(MultipartFile file, String key) throws IOException {
+    public String uploadFileWithoutLocal(MultipartFile file, String key) throws IOException {
         InputStream inputStream = file.getInputStream();
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
@@ -79,16 +62,12 @@ public class CosManager {
         PutObjectRequest putObjectRequest = new PutObjectRequest(
                 cosClientConfig.getBucket(), key, inputStream, metadata
         );
-        // 对图片进行处理
-        PicOperations picOperations = new PicOperations();
-        picOperations.setIsPicInfo(1);
-        putObjectRequest.setPicOperations(picOperations);
         PutObjectResult result = cosClient.putObject(putObjectRequest);
         if (result != null) {
             // 构建访问url
             String url = String.format("%s%s", cosClientConfig.getHost(), key);
             log.info("文件上传COS成功：{} -> {}", file.getName(), url);
-            return result;
+            return url;
         } else {
             log.error("文件上传COS失败，返回结果为空");
             return null;
@@ -116,21 +95,9 @@ public class CosManager {
                 "." + pictureMessage.getFormatName(file);
         log.info("文件名: {}", FileUtil.mainName(originalFileName));
         try {
-
-            PutObjectResult putObjectResult = this.uploadFileWithoutLocal(file, uploadFilename);
-            ImageInfo imageInfo = putObjectResult.getCiUploadResult().getOriginalInfo().getImageInfo();
-            // 封装结果
-            UploadPictureResult uploadPictureResult = new UploadPictureResult();
-            int height = imageInfo.getHeight();
-            int width = imageInfo.getWidth();
-            double picScale = (double) width / height;
-            uploadPictureResult.setPicHeight(height);
-            uploadPictureResult.setPicWidth(width);
-            uploadPictureResult.setPicScale(picScale);
-            uploadPictureResult.setPicFormat(imageInfo.getFormat());
-            String url = String.format("%s%s", cosClientConfig.getHost(), uploadFilename);
+            UploadPictureResult uploadPictureResult = pictureMessage.getPicture(file);
+            String url = this.uploadFileWithoutLocal(file, uploadFilename);
             uploadPictureResult.setUrl(url);
-            uploadPictureResult.setPicSize(file.getSize());
             uploadPictureResult.setPicName(FileUtil.mainName(originalFileName));
             return uploadPictureResult;
         } catch (IOException e) {
@@ -157,23 +124,6 @@ public class CosManager {
         ThrowUtils.throwIf(!ALLOW_FORMAT_LIST.contains(fileSuffix), ErrorCode.PARAMS_ERROR, "文件类型错误");
     }
 
-    /**
-     * 在COS中删除图像
-     *
-     * @param url
-     * @return
-     */
-    public boolean deleteCOSPicture(String url) {
-        String[] splits = url.split(cosClientConfig.getHost());
-        String key = splits[splits.length - 1];
-        try {
-            cosClient.deleteObject(cosClientConfig.getBucket(), key);
-        } catch (CosClientException e) {
-            e.printStackTrace();
-        }
-        log.info("在cos删除图像成功");
-        return true;
-    }
 
     /**
      * 从URL获取图像并上传（为了能够获取图像信息，就需要先保存到临时文件，然后读取图像获取信息）
@@ -199,7 +149,7 @@ public class CosManager {
             file = File.createTempFile(fileTempPath, null);
             HttpUtil.downloadFile(fileUrl, file);
             // 上传临时文件到COS，key是uploadFilename
-            this.putObject(uploadFilename, file);
+            cosManager.putObject(uploadFilename, file);
             UploadPictureResult uploadPictureResult = pictureMessage.getPicture(file);
             String url = String.format("%s%s", cosClientConfig.getHost(), uploadFilename);
             uploadPictureResult.setUrl(url);

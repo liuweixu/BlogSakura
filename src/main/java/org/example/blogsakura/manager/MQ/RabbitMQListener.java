@@ -1,4 +1,4 @@
-package org.example.blogsakura.manager;
+package org.example.blogsakura.manager.MQ;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package org.example.blogsakura.manager;
+package org.example.blogsakura.manager.BloomFilter;
 
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
