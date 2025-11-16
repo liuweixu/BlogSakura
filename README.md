@@ -30,7 +30,7 @@ WebSocket的综合博客平台，除了提供发表、查看文章等基本博�
 - Ant Design: 组件库。
 - Axios：请求库。
 - react-image-crop: 图像编辑库。
-- react-masonry-css: 实现瀑布图的开源库。
+- react-masonry-css: 实现瀑布流的开源库。
 - OpenAPI: 前端代码生成。
 
 ## 项目总结列表
