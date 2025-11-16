@@ -5,7 +5,7 @@
 基于SpringBoot + Mybatis-Flex + Redis + RabbitMQ +
 WebSocket的综合博客平台，除了提供发表、查看文章等基本博客功能以外，还提供公共图库、私有空间和团队空间模块。管理员能同时管理公共图库、用户和空间等模块，用户不仅能进行图片上传私有空间，还可以搭建团队空间并邀请其他用户共享和实时协同编辑图片。
 
-## 项目架构图（待定）
+## 项目架构图
 
 ![项目架构图](images/项目架构图.png)
 
@@ -32,6 +32,12 @@ WebSocket的综合博客平台，除了提供发表、查看文章等基本博�
 - react-image-crop: 图像编辑库。
 - react-masonry-css: 实现瀑布图的开源库。
 - OpenAPI: 前端代码生成。
+
+## 项目总结列表
+
+此处部分比较多，故而用飞书链接形式展示：
+
+[项目总结](https://rslvikpbsl.feishu.cn/docx/Iy5ld4CcAo4yUnxpBlgcs1lCnGf)
 
 ## 项目功能模块
 
