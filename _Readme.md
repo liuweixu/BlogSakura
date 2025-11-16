@@ -96,7 +96,7 @@ npm run dev
 
 ## 前端
 
-![img.png](images/img.png)
+![img.png](images/home1.png)
 
 ![img_7.png](images/img_7.png)
 

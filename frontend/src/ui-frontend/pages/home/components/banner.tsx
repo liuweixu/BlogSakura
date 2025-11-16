@@ -56,7 +56,7 @@ export const Banner = () => {
             您好
           </h1>
           {/**对您好下面的黑色方框（带有箭头）绘制 */}
-          <div
+          {/* <div
             id="header-box-info"
             className="relative w-[65%] m-auto text-[#eaeadf] bg-black/50
               p-4 mt-6 leading-7.5 rounded-2xl box-content whitespace-nowrap before:content-['']
@@ -68,7 +68,6 @@ export const Banner = () => {
                 {"You got to put the past behind you before you can move on."}
               </span>
             </p>
-            {/**这部分 初步完成，剩下就是添加事件和应用 */}
             <div
               id="header-social"
               className="h-9 -mb-2.5 list-none inline-block"
@@ -88,7 +87,7 @@ export const Banner = () => {
                 />
               </li>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

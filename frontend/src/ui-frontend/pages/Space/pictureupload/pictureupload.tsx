@@ -279,7 +279,7 @@ function App() {
   const handleEditPicture = () => {
     const currentFile = fileList.find((file) => file.status === "done");
     const currentPictureId =
-      pictureId || (searchParamsId ? Number(searchParamsId) : undefined);
+      pictureId || (searchParamsId ? searchParamsId : undefined);
     if (currentFile?.url) {
       cropModalRef.current?.open(currentFile.url, currentPictureId);
     } else if (currentFile?.response?.imgUrl) {

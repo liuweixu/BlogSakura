@@ -16,7 +16,7 @@ function App() {
   const navItems = [
     { path: "/", label: "首页", icon: HomeOutlined },
     { path: "/pictures", label: "图库", icon: FolderOutlined },
-    { path: "/personal_space", label: "私有空间", icon: FolderOutlined },
+    { path: "/personal_space", label: "空间", icon: FolderOutlined },
     { path: "/backend", label: "管理者界面", icon: AndroidOutlined },
   ];
 
