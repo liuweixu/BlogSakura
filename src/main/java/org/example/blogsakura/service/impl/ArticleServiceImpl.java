@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.manager.CosManager;
 import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
+import org.example.blogsakura.manager.CosManagerLocalProcess;
 import org.example.blogsakura.mapper.ChannelMapper;
 import org.example.blogsakura.model.dto.article.Article;
 import org.example.blogsakura.mapper.ArticleMapper;
@@ -41,7 +42,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private ChannelMapper channelMapper;
 
     @Resource
-    private CosManager cosManager;
+    private CosManagerLocalProcess cosManagerLocalProcess;
 
     /**
      * 分页查询条件
@@ -129,7 +130,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 生成COS对象键（可以根据需要自定义路径格式）
         String cosKey = "/blogs/images/" + uuid + ".png";
         try {
-            return cosManager.uploadFileWithoutLocal(file, cosKey);
+            return cosManagerLocalProcess.uploadFileWithoutLocal(file, cosKey);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

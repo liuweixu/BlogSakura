@@ -7,11 +7,14 @@ import cn.hutool.http.HttpStatus;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.demo.PicOperationDemo;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
+import com.qcloud.cos.model.ciModel.persistence.PicOperations;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.ml.inference.preprocessing.Multi;
@@ -61,14 +64,14 @@ public class CosManager {
     }
 
     /**
-     * 通用文件上传到COS并返回访问URL（非云图部分）
+     * 通用文件上传到COS并返回访问URL 需要数据万象处理
      *
      * @param file
      * @param key  cos的对象键，即图片的存储路径
      * @return
      * @throws IOException
      */
-    public String uploadFileWithoutLocal(MultipartFile file, String key) throws IOException {
+    public PutObjectResult uploadFileWithoutLocal(MultipartFile file, String key) throws IOException {
         InputStream inputStream = file.getInputStream();
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
@@ -76,12 +79,16 @@ public class CosManager {
         PutObjectRequest putObjectRequest = new PutObjectRequest(
                 cosClientConfig.getBucket(), key, inputStream, metadata
         );
+        // 对图片进行处理
+        PicOperations picOperations = new PicOperations();
+        picOperations.setIsPicInfo(1);
+        putObjectRequest.setPicOperations(picOperations);
         PutObjectResult result = cosClient.putObject(putObjectRequest);
         if (result != null) {
             // 构建访问url
             String url = String.format("%s%s", cosClientConfig.getHost(), key);
             log.info("文件上传COS成功：{} -> {}", file.getName(), url);
-            return url;
+            return result;
         } else {
             log.error("文件上传COS失败，返回结果为空");
             return null;
@@ -109,9 +116,21 @@ public class CosManager {
                 "." + pictureMessage.getFormatName(file);
         log.info("文件名: {}", FileUtil.mainName(originalFileName));
         try {
-            UploadPictureResult uploadPictureResult = pictureMessage.getPicture(file);
-            String url = this.uploadFileWithoutLocal(file, uploadFilename);
+
+            PutObjectResult putObjectResult = this.uploadFileWithoutLocal(file, uploadFilename);
+            ImageInfo imageInfo = putObjectResult.getCiUploadResult().getOriginalInfo().getImageInfo();
+            // 封装结果
+            UploadPictureResult uploadPictureResult = new UploadPictureResult();
+            int height = imageInfo.getHeight();
+            int width = imageInfo.getWidth();
+            double picScale = (double) width / height;
+            uploadPictureResult.setPicHeight(height);
+            uploadPictureResult.setPicWidth(width);
+            uploadPictureResult.setPicScale(picScale);
+            uploadPictureResult.setPicFormat(imageInfo.getFormat());
+            String url = String.format("%s%s", cosClientConfig.getHost(), uploadFilename);
             uploadPictureResult.setUrl(url);
+            uploadPictureResult.setPicSize(file.getSize());
             uploadPictureResult.setPicName(FileUtil.mainName(originalFileName));
             return uploadPictureResult;
         } catch (IOException e) {
