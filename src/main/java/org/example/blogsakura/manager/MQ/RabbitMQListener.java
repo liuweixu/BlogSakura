@@ -1,5 +1,8 @@
 package org.example.blogsakura.manager.MQ;
 
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.example.blogsakura.common.constants.RabbitMQConstants;
@@ -9,6 +12,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Configuration

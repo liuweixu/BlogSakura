@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest
 @Slf4j
@@ -20,7 +22,7 @@ public class TestCC {
 
     @Test
     void test() throws IOException {
-
+        List<Integer> res = new ArrayList<>();
         log.info("spaceUserAuthManager:{}", spaceUserAuthManager.getPermissionsByRole("admin"));
     }
 }
