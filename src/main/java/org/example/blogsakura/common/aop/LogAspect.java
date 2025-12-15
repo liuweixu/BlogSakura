@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
@@ -21,6 +23,8 @@ public class LogAspect {
 
     @Resource
     private OperateLogService operateLogService;
+
+    private final Map<MethodSignature, Method> methodCache = new ConcurrentHashMap<>();
 
     /**
      * PointCut切入点
@@ -38,7 +42,13 @@ public class LogAspect {
 
         // 获取操作方法名
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
+        Method method;
+        if (methodCache.containsKey(signature)) {
+            method = methodCache.get(signature);
+        } else {
+            method = signature.getMethod();
+            methodCache.put(signature, method);
+        }
         Log annotation = method.getAnnotation(Log.class);
         String operateName = annotation != null ? annotation.value() : "";
 
@@ -49,7 +59,7 @@ public class LogAspect {
         long costTime = endTime - beginTime;
 
         OperateLog operateLog = new OperateLog();
-        if (operateName != null && !operateName.equals("")) {
+        if (operateName != null && !operateName.isEmpty()) {
             operateLog.setOperateName(operateName);
             operateLog.setOperateTime(operateTime);
             operateLog.setCostTime(costTime);

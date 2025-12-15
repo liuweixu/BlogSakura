@@ -42,8 +42,6 @@ public class SpaceController {
 
     @Resource
     private UserService userService;
-    @Autowired
-    private SpaceMapper spaceMapper;
 
     /**
      * 创建空间（所有人都可以使用）。

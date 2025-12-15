@@ -49,12 +49,8 @@ public class ArticleController {
 
     @Resource
     private ArticleBloomFilter articleBloomFilter;
-
+    
     @Resource
-    private PictureMessage pictureMessage;
-    @Autowired
-    private PictureService pictureService;
-    @Autowired
     private CosManager cosManager;
 
     /**
