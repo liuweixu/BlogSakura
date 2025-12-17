@@ -3,8 +3,6 @@ package org.example.blogsakura.service.impl;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
-import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
 import org.example.blogsakura.common.exception.ThrowUtils;
 import org.example.blogsakura.mapper.ArticleMapper;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -40,9 +37,7 @@ public class ChannelServiceImpl extends ServiceImpl<ChannelMapper, Channel> impl
      */
     @Override
     public ChannelVO getChannelVO(Channel channel) {
-        if (channel == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "频道不存在");
-        }
+        ThrowUtils.throwIf(channel == null, ErrorCode.PARAMS_ERROR, "频道不存在");
         ChannelVO channelVO = new ChannelVO();
         BeanUtils.copyProperties(channel, channelVO);
         Long channelVOId = channelVO.getId();
@@ -53,9 +48,7 @@ public class ChannelServiceImpl extends ServiceImpl<ChannelMapper, Channel> impl
 
     @Override
     public List<ChannelVO> getChannelVOList(List<Channel> channelList) {
-        if (channelList == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "频道列表不存在");
-        }
+        ThrowUtils.throwIf(channelList == null, ErrorCode.PARAMS_ERROR, "频道列表不存在");
         return channelList.stream().map(this::getChannelVO).collect(Collectors.toList());
     }
 

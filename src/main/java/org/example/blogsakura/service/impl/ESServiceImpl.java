@@ -64,7 +64,7 @@ public class ESServiceImpl implements ESService {
         try {
             client.index(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("添加文章到ES失败，失败原因：{}", e.getMessage());
         }
     }
 
@@ -82,7 +82,7 @@ public class ESServiceImpl implements ESService {
             // 2. 发送请求
             client.delete(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("删除ES文章失败，原因：{}", e.getMessage());
         }
     }
 
@@ -105,7 +105,7 @@ public class ESServiceImpl implements ESService {
         try {
             client.bulk(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("初始化数据库到ES失败，原因：{}", e.getMessage());
         }
     }
 

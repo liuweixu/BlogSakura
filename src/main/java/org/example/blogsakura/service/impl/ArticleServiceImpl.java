@@ -4,8 +4,8 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.example.blogsakura.common.exception.BusinessException;
 import org.example.blogsakura.common.exception.ErrorCode;
+import org.example.blogsakura.common.exception.ThrowUtils;
 import org.example.blogsakura.manager.cos.CosManagerLocalProcess;
 import org.example.blogsakura.mapper.ChannelMapper;
 import org.example.blogsakura.model.dto.article.Article;
@@ -22,8 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * 文章表 服务层实现。
@@ -51,9 +51,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     @Override
     public QueryWrapper getQueryWrapper(ArticleQueryRequest articleQueryRequest) {
-        if (articleQueryRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
-        }
+        ThrowUtils.throwIf(articleQueryRequest == null, ErrorCode.PARAMS_ERROR, "请求参数为空");
         Long id = articleQueryRequest.getId();
         String channelName = articleQueryRequest.getChannel();
         Channel channel = channelMapper.getChannelByChannelName(channelName);
@@ -67,22 +65,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Long like = articleQueryRequest.getLike();
         String sortField = articleQueryRequest.getSortField();
         String sortOrder = articleQueryRequest.getSortOrder();
-        if (channel != null) {
-            return QueryWrapper.create()
-                    .eq("id", id)
-                    .eq("channelId", channel.getId())
-                    .eq("imageType", imageType)
-                    .like("content", content)
-                    .like("title", title)
-                    .orderBy(sortField, "ascend".equals(sortOrder));
-        } else {
-            return QueryWrapper.create()
-                    .eq("id", id)
-                    .eq("title", title)
-                    .eq("imageType", imageType)
-                    .like("content", content)
-                    .orderBy(sortField, "ascend".equals(sortOrder));
-        }
+        return Optional.ofNullable(channel)
+                .map(ch -> QueryWrapper.create()
+                        .eq("id", id)
+                        .eq("channelId", ch.getId())
+                        .eq("imageType", imageType)
+                        .like("content", content)
+                        .like("title", title)
+                        .orderBy(sortField, "ascend".equals(sortOrder)))
+                .orElseGet(() -> QueryWrapper.create()
+                        .eq("id", id)
+                        .eq("title", title)
+                        .eq("imageType", imageType)
+                        .like("content", content)
+                        .orderBy(sortField, "ascend".equals(sortOrder)));
     }
 
     /**
@@ -93,9 +89,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     @Override
     public ArticleVO getArticleVO(Article article) {
-        if (article == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
-        }
+        ThrowUtils.throwIf(article == null, ErrorCode.PARAMS_ERROR, "参数为空");
         ArticleVO articleVO = new ArticleVO();
         BeanUtils.copyProperties(article, articleVO);
         Long channelId = article.getChannelId();
@@ -112,10 +106,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
      */
     @Override
     public List<ArticleVO> getArticleVOList(List<Article> articleList) {
-        if (articleList == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
-        }
-        return articleList.stream().map(this::getArticleVO).collect(Collectors.toList());
+        ThrowUtils.throwIf(articleList == null, ErrorCode.PARAMS_ERROR);
+        return articleList.stream().map(this::getArticleVO).toList();
     }
 
     /**
@@ -131,9 +123,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         try {
             return cosManagerLocalProcess.uploadFileWithoutLocal(file, cosKey);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
+            return null;
         }
     }
-
-
 }
