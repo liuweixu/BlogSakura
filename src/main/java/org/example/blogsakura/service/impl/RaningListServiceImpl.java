@@ -47,11 +47,11 @@ public class RaningListServiceImpl implements RankingListService {
     private List<ArticleVO> convertToRankList(Set<String> articleIds) {
         ThrowUtils.throwIf(articleIds == null || articleIds.isEmpty(), ErrorCode.PARAMS_ERROR);
         List<ArticleVO> articleVOList = new ArrayList<>();
-        for (String articleId : articleIds) {
+        articleIds.forEach(articleId -> {
             Article article = articleService.getById(articleId);
             ArticleVO articleVO = articleService.getArticleVO(article);
             articleVOList.add(articleVO);
-        }
+        });
         return articleVOList;
     }
 }

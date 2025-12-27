@@ -134,9 +134,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 3. 记录用户的登录态
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
-//        // 记录用户登录态到Sa-token
-//        StpKit.SPACE.login(user.getId());
-//        StpKit.SPACE.getSession().set(UserConstant.USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user); // 返回脱敏后的用户数据
     }
 
