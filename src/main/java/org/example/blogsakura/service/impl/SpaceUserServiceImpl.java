@@ -1,25 +1,24 @@
 package org.example.blogsakura.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
-import org.example.blogsakura.common.exception.BusinessException;
-import org.example.blogsakura.common.exception.ErrorCode;
-import org.example.blogsakura.common.exception.ThrowUtils;
-import org.example.blogsakura.model.dto.space.Space;
+import org.example.blogsakuraDDD.infrastruct.exception.BusinessException;
+import org.example.blogsakuraDDD.infrastruct.exception.ErrorCode;
+import org.example.blogsakuraDDD.infrastruct.exception.ThrowUtils;
+import org.example.blogsakuraDDD.domain.space.entity.Space;
 import org.example.blogsakura.model.dto.spaceUser.SpaceUser;
-import org.example.blogsakura.mapper.SpaceUserMapper;
+import org.example.blogsakuraDDD.infrastruct.mapper.SpaceUserMapper;
 import org.example.blogsakura.model.dto.spaceUser.SpaceUserAddRequest;
 import org.example.blogsakura.model.dto.spaceUser.SpaceUserQueryRequest;
-import org.example.blogsakura.model.dto.user.User;
-import org.example.blogsakura.model.enums.SpaceRoleEnum;
-import org.example.blogsakura.model.vo.space.SpaceVO;
+import org.example.blogsakuraDDD.domain.user.entity.User;
+import org.example.blogsakuraDDD.domain.space.valueobject.SpaceRoleEnum;
+import org.example.blogsakuraDDD.interfaces.vo.space.SpaceVO;
 import org.example.blogsakura.model.vo.spaceUser.SpaceUserVO;
-import org.example.blogsakura.model.vo.user.UserVO;
+import org.example.blogsakuraDDD.interfaces.vo.user.UserVO;
 import org.example.blogsakura.service.SpaceService;
 import org.example.blogsakura.service.SpaceUserService;
-import org.example.blogsakura.service.UserService;
+import org.example.blogsakuraDDD.application.service.UserApplicationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +37,7 @@ import java.util.stream.Collectors;
 public class SpaceUserServiceImpl extends ServiceImpl<SpaceUserMapper, SpaceUser> implements SpaceUserService {
 
     @Resource
-    private UserService userService;
+    private UserApplicationService userService;
     @Resource
     private SpaceService spaceService;
 

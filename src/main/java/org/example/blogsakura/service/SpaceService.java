@@ -4,11 +4,11 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.example.blogsakura.model.dto.space.Space;
-import org.example.blogsakura.model.dto.space.SpaceAddRequest;
-import org.example.blogsakura.model.dto.space.SpaceQueryRequest;
-import org.example.blogsakura.model.dto.user.User;
-import org.example.blogsakura.model.vo.space.SpaceVO;
+import org.example.blogsakuraDDD.domain.space.entity.Space;
+import org.example.blogsakuraDDD.interfaces.dto.space.SpaceAddRequest;
+import org.example.blogsakuraDDD.interfaces.dto.space.SpaceQueryRequest;
+import org.example.blogsakuraDDD.domain.user.entity.User;
+import org.example.blogsakuraDDD.interfaces.vo.space.SpaceVO;
 
 import java.util.List;
 

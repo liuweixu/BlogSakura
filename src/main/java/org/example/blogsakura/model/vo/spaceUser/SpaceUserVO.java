@@ -2,8 +2,8 @@ package org.example.blogsakura.model.vo.spaceUser;
 
 import lombok.Data;
 import org.example.blogsakura.model.dto.spaceUser.SpaceUser;
-import org.example.blogsakura.model.vo.space.SpaceVO;
-import org.example.blogsakura.model.vo.user.UserVO;
+import org.example.blogsakuraDDD.interfaces.vo.space.SpaceVO;
+import org.example.blogsakuraDDD.interfaces.vo.user.UserVO;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;

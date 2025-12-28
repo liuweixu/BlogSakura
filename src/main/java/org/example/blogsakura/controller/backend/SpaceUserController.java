@@ -2,20 +2,18 @@ package org.example.blogsakura.controller.backend;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.example.blogsakura.common.common.BaseResponse;
-import org.example.blogsakura.common.common.DeleteRequest;
-import org.example.blogsakura.common.common.ResultUtils;
-import org.example.blogsakura.common.constants.SpaceUserPermissionConstant;
-import org.example.blogsakura.common.exception.ErrorCode;
-import org.example.blogsakura.common.exception.ThrowUtils;
+import org.example.blogsakuraDDD.infrastruct.common.BaseResponse;
+import org.example.blogsakuraDDD.infrastruct.common.DeleteRequest;
+import org.example.blogsakuraDDD.infrastruct.common.ResultUtils;
+import org.example.blogsakuraDDD.infrastruct.exception.ErrorCode;
+import org.example.blogsakuraDDD.infrastruct.exception.ThrowUtils;
 import org.example.blogsakura.model.dto.spaceUser.SpaceUserAddRequest;
 import org.example.blogsakura.model.dto.spaceUser.SpaceUserEditRequest;
 import org.example.blogsakura.model.dto.spaceUser.SpaceUserQueryRequest;
-import org.example.blogsakura.model.dto.user.User;
+import org.example.blogsakuraDDD.domain.user.entity.User;
 import org.example.blogsakura.model.vo.spaceUser.SpaceUserVO;
-import org.example.blogsakura.service.UserService;
+import org.example.blogsakuraDDD.application.service.UserApplicationService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -39,7 +37,7 @@ public class SpaceUserController {
     @Resource
     private SpaceUserService spaceUserService;
     @Resource
-    private UserService userService;
+    private UserApplicationService userService;
 
     /**
      * 添加成员到空间

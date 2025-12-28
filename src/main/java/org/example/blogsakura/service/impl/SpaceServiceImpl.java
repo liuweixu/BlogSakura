@@ -1,6 +1,5 @@
 package org.example.blogsakura.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -9,29 +8,25 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.example.blogsakura.common.exception.BusinessException;
-import org.example.blogsakura.common.exception.ErrorCode;
-import org.example.blogsakura.common.exception.ThrowUtils;
-import org.example.blogsakura.mapper.SpaceUserMapper;
-import org.example.blogsakura.model.dto.picture.Picture;
-import org.example.blogsakura.model.dto.space.Space;
-import org.example.blogsakura.mapper.SpaceMapper;
-import org.example.blogsakura.model.dto.space.SpaceAddRequest;
-import org.example.blogsakura.model.dto.space.SpaceQueryRequest;
+import org.example.blogsakuraDDD.infrastruct.exception.BusinessException;
+import org.example.blogsakuraDDD.infrastruct.exception.ErrorCode;
+import org.example.blogsakuraDDD.infrastruct.exception.ThrowUtils;
+import org.example.blogsakuraDDD.infrastruct.mapper.SpaceUserMapper;
+import org.example.blogsakuraDDD.domain.space.entity.Space;
+import org.example.blogsakuraDDD.infrastruct.mapper.SpaceMapper;
+import org.example.blogsakuraDDD.interfaces.dto.space.SpaceAddRequest;
+import org.example.blogsakuraDDD.interfaces.dto.space.SpaceQueryRequest;
 import org.example.blogsakura.model.dto.spaceUser.SpaceUser;
-import org.example.blogsakura.model.dto.user.User;
-import org.example.blogsakura.model.enums.SpaceLevelEnum;
-import org.example.blogsakura.model.enums.SpaceRoleEnum;
-import org.example.blogsakura.model.enums.SpaceTypeEnum;
-import org.example.blogsakura.model.vo.picture.PictureVO;
-import org.example.blogsakura.model.vo.space.SpaceVO;
+import org.example.blogsakuraDDD.domain.user.entity.User;
+import org.example.blogsakuraDDD.domain.space.valueobject.SpaceLevelEnum;
+import org.example.blogsakuraDDD.domain.space.valueobject.SpaceRoleEnum;
+import org.example.blogsakuraDDD.domain.space.valueobject.SpaceTypeEnum;
+import org.example.blogsakuraDDD.interfaces.vo.space.SpaceVO;
 import org.example.blogsakura.service.SpaceService;
-import org.example.blogsakura.service.SpaceUserService;
-import org.example.blogsakura.service.UserService;
+import org.example.blogsakuraDDD.application.service.UserApplicationService;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -59,7 +54,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
     @Resource
     private RedissonClient redissonClient;
     @Resource
-    private UserService userService;
+    private UserApplicationService userService;
     @Resource
     private SpaceMapper spaceMapper;
     @Resource
@@ -138,7 +133,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
         Long userId = user.getId();
         space.setUserId(userId);
         // 权限校验
-        if (SpaceLevelEnum.COMMON.getValue() != spaceAddRequest.getSpaceLevel() && !userService.isAdmin(user)) {
+        if (SpaceLevelEnum.COMMON.getValue() != spaceAddRequest.getSpaceLevel() && !user.isAdmin()) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR, "无权限创建指定级别的空间");
         }
         // 针对用户加锁（分布式锁）
@@ -146,7 +141,7 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space> implements
         lock.lock();
         try {
             Long newSpaceId = transactionTemplate.execute(status -> {
-                if (!userService.isAdmin(user)) {
+                if (!user.isAdmin()) {
                     boolean exist = exists(this.query()
                             .eq(Space::getUserId, userId)
                             .eq(Space::getSpaceType, spaceAddRequest.getSpaceType()));

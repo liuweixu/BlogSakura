@@ -1,7 +1,6 @@
 package org.example.blogsakura.service;
 
-import org.example.blogsakura.model.dto.user.User;
-import org.example.blogsakura.model.vo.article.ArticleVO;
+import org.example.blogsakuraDDD.interfaces.vo.blog.article.ArticleVO;
 
 import java.util.List;
 
@@ -14,5 +13,5 @@ public interface RankingListService {
      */
     List<ArticleVO> getRankingList();
 
-    
+
 }

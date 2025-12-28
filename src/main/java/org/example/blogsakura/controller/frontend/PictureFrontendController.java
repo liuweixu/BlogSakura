@@ -6,37 +6,28 @@ import com.mybatisflex.core.paginate.Page;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomUtils;
-import org.example.blogsakura.common.annotation.AuthCheck;
-import org.example.blogsakura.common.common.BaseResponse;
-import org.example.blogsakura.common.common.DeleteRequest;
-import org.example.blogsakura.common.common.ResultUtils;
-import org.example.blogsakura.common.constants.SpaceUserPermissionConstant;
-import org.example.blogsakura.common.constants.UserConstant;
-import org.example.blogsakura.common.exception.BusinessException;
-import org.example.blogsakura.common.exception.ErrorCode;
-import org.example.blogsakura.common.exception.ThrowUtils;
-import org.example.blogsakura.mapper.SpaceMapper;
-import org.example.blogsakura.model.dto.picture.Picture;
-import org.example.blogsakura.model.dto.picture.PictureEditRequest;
-import org.example.blogsakura.model.dto.picture.PictureQueryRequest;
-import org.example.blogsakura.model.dto.picture.PictureUpdateRequest;
-import org.example.blogsakura.model.dto.space.Space;
-import org.example.blogsakura.model.dto.user.User;
-import org.example.blogsakura.model.vo.picture.PictureVO;
-import org.example.blogsakura.service.PictureService;
+import org.example.blogsakuraDDD.infrastruct.common.BaseResponse;
+import org.example.blogsakuraDDD.infrastruct.common.DeleteRequest;
+import org.example.blogsakuraDDD.infrastruct.common.ResultUtils;
+import org.example.blogsakuraDDD.infrastruct.exception.BusinessException;
+import org.example.blogsakuraDDD.infrastruct.exception.ErrorCode;
+import org.example.blogsakuraDDD.infrastruct.exception.ThrowUtils;
+import org.example.blogsakuraDDD.infrastruct.mapper.SpaceMapper;
+import org.example.blogsakuraDDD.domain.picture.entity.Picture;
+import org.example.blogsakuraDDD.interfaces.dto.picture.PictureQueryRequest;
+import org.example.blogsakuraDDD.interfaces.dto.picture.PictureUpdateRequest;
+import org.example.blogsakuraDDD.domain.space.entity.Space;
+import org.example.blogsakuraDDD.domain.user.entity.User;
+import org.example.blogsakuraDDD.interfaces.vo.picture.PictureVO;
+import org.example.blogsakuraDDD.application.service.PictureApplicationService;
 import org.example.blogsakura.service.SpaceService;
-import org.example.blogsakura.service.UserService;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.blogsakuraDDD.application.service.UserApplicationService;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -45,9 +36,9 @@ import java.util.concurrent.TimeUnit;
 public class PictureFrontendController {
 
     @Resource
-    private PictureService pictureService;
+    private PictureApplicationService pictureApplicationService;
     @Resource
-    private UserService userService;
+    private UserApplicationService userService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
@@ -91,9 +82,9 @@ public class PictureFrontendController {
             }
         }
         // 查询数据库
-        Page<Picture> picturePage = pictureService.page(Page.of(currentPage, pageSize),
-                pictureService.getQueryWrapper(pictureQueryRequest));
-        return ResultUtils.success(pictureService.getPictureVOPage(picturePage, request));
+        Page<Picture> picturePage = pictureApplicationService.page(Page.of(currentPage, pageSize),
+                pictureApplicationService.getQueryWrapper(pictureQueryRequest));
+        return ResultUtils.success(pictureApplicationService.getPictureVOPage(picturePage, request));
     }
 
     @PostMapping("/list/page/vo/cache")
@@ -119,10 +110,10 @@ public class PictureFrontendController {
             return ResultUtils.success(cachePage);
         }
         // 查询数据库
-        Page<Picture> picturePage = pictureService.page(Page.of(currentPage, pageSize),
-                pictureService.getQueryWrapper(pictureQueryRequest));
+        Page<Picture> picturePage = pictureApplicationService.page(Page.of(currentPage, pageSize),
+                pictureApplicationService.getQueryWrapper(pictureQueryRequest));
         // 获取封装类
-        Page<PictureVO> pictureVOPage = pictureService.getPictureVOPage(picturePage, request);
+        Page<PictureVO> pictureVOPage = pictureApplicationService.getPictureVOPage(picturePage, request);
 
         // 存入Redis缓存
         cacheValue = JSONUtil.toJsonStr(pictureVOPage);
@@ -144,7 +135,7 @@ public class PictureFrontendController {
         ThrowUtils.throwIf(pictureEditRequest == null, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.sessionLoginUser(request);
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR);
-        boolean result = pictureService.updatePicture(pictureEditRequest, request);
+        boolean result = pictureApplicationService.updatePicture(pictureEditRequest, request);
         return ResultUtils.success(result);
     }
 
@@ -159,16 +150,16 @@ public class PictureFrontendController {
         ThrowUtils.throwIf(deleteRequest == null, ErrorCode.PARAMS_ERROR);
         Long id = deleteRequest.getId();
         ThrowUtils.throwIf(id == null || id <= 0, ErrorCode.PARAMS_ERROR);
-        Picture picture = pictureService.getById(id);
+        Picture picture = pictureApplicationService.getById(id);
         User loginUser = userService.sessionLoginUser(request);
-        pictureService.checkPictureAuth(loginUser, picture);
+        pictureApplicationService.checkPictureAuth(loginUser, picture);
         if (picture == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "图片id不存在");
         }
         // 开启事务
         transactionTemplate.execute(status -> {
             // 操作数据库
-            boolean result = pictureService.removeById(id);
+            boolean result = pictureApplicationService.removeById(id);
             ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
             // 释放额度
             Long spaceId = picture.getSpaceId();
@@ -176,12 +167,12 @@ public class PictureFrontendController {
                 boolean update = spaceMapper.decrementSpaceMySpace(spaceId, picture.getPicSize(), 1);
                 ThrowUtils.throwIf(!update, ErrorCode.OPERATION_ERROR, "额度更新失败");
             }
-            pictureService.deleteDeepPicture(id);
+            pictureApplicationService.deleteDeepPicture(id);
             return true;
         });
 
         // 操作数据库
-        boolean result = pictureService.removeById(id);
+        boolean result = pictureApplicationService.removeById(id);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(result);
     }
@@ -196,15 +187,15 @@ public class PictureFrontendController {
     public BaseResponse<PictureVO> getFrontendPictureVOById(@PathVariable Long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
         log.info("测试id:{}", id);
-        Picture picture = pictureService.getById(id);
+        Picture picture = pictureApplicationService.getById(id);
         if (picture == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "图片id不存在");
         }
         Long spaceId = picture.getSpaceId();
         if (spaceId != null) {
             User loginUser = userService.sessionLoginUser(request);
-            pictureService.checkPictureAuth(loginUser, picture);
+            pictureApplicationService.checkPictureAuth(loginUser, picture);
         }
-        return ResultUtils.success(pictureService.getPictureVO(picture, request));
+        return ResultUtils.success(pictureApplicationService.getPictureVO(picture, request));
     }
 }

@@ -1,11 +1,11 @@
 package org.example.blogsakura.service.impl;
 
 import jakarta.annotation.Resource;
-import org.example.blogsakura.common.exception.ErrorCode;
-import org.example.blogsakura.common.exception.ThrowUtils;
-import org.example.blogsakura.model.dto.article.Article;
-import org.example.blogsakura.model.vo.article.ArticleVO;
-import org.example.blogsakura.service.ArticleService;
+import org.example.blogsakuraDDD.infrastruct.exception.ErrorCode;
+import org.example.blogsakuraDDD.infrastruct.exception.ThrowUtils;
+import org.example.blogsakuraDDD.domain.blog.article.entity.Article;
+import org.example.blogsakuraDDD.interfaces.vo.blog.article.ArticleVO;
+import org.example.blogsakuraDDD.application.service.ArticleApplicationService;
 import org.example.blogsakura.service.RankingListService;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
@@ -20,7 +20,7 @@ public class RaningListServiceImpl implements RankingListService {
     private StringRedisTemplate stringRedisTemplate;
 
     @Resource
-    private ArticleService articleService;
+    private ArticleApplicationService articleService;
 
     /**
      * 获取排行榜
