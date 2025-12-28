@@ -2,8 +2,8 @@ package org.example.blogsakura2;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.example.blogsakuraDDD.BlogsakuraApplication;
-import org.example.blogsakuraDDD.share.auth.SpaceUserAuthManager;
+import org.example.blogsakura.BlogsakuraApplication;
+import org.example.blogsakura.share.auth.SpaceUserAuthManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
