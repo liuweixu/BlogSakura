@@ -123,7 +123,7 @@ public class PictureDomainServiceImpl extends ServiceImpl<PictureMapper, Picture
 
     /**
      * 上传图片到COS，用户目前默认为管理者admin
-     * 新增URL方式
+     * 新增URL方式 模板方法
      *
      * @param inputSource
      * @param pictureUploadRequest
@@ -176,6 +176,7 @@ public class PictureDomainServiceImpl extends ServiceImpl<PictureMapper, Picture
 //        } else {
 //            uploadPictureResult = cosManager.uploadPictureByUrl((String) inputSource, uploadPathPrefix);
 //        }
+        // 判断上传方式
         PictureUploadTemplate pictureUploadTemplate = filePictureUpload;
         if (inputSource instanceof String) {
             pictureUploadTemplate = urlPictureUpload;
