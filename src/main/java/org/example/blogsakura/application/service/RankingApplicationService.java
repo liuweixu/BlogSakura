@@ -1,15 +1,15 @@
-package org.example.blogsakura.domain.blog.ranking.service;
+package org.example.blogsakura.application.service;
 
 import org.example.blogsakura.interfaces.vo.blog.article.ArticleVO;
 
 import java.util.List;
 
-public interface RankingListService {
+public interface RankingApplicationService {
 
     /**
-     * 获取排行榜
+     * 获取文章排行榜
      *
-     * @return
+     * @return 文章列表
      */
     List<ArticleVO> getRankingList();
 
@@ -19,5 +19,4 @@ public interface RankingListService {
      * @param articleId 文章 id
      */
     void increaseRankingScore(Long articleId);
-
 }

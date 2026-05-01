@@ -1,6 +1,7 @@
 import { Banner } from "./components/banner";
 import { Feature } from "./components/feature";
 import { ListWrapper } from "./components/list_articles";
+import { RankingList } from "./components/ranking_list";
 function App() {
   return (
     <div className="w-full">
@@ -17,7 +18,14 @@ function App() {
         }}
       >
         <Feature />
-        <ListWrapper />
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="w-full lg:w-3/4">
+            <ListWrapper />
+          </div>
+          <div className="w-full lg:w-1/4 mt-14">
+            <RankingList />
+          </div>
+        </div>
       </div>
     </div>
   );

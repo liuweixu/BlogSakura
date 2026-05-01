@@ -7,6 +7,7 @@ import org.example.blogsakura.domain.blog.article.entity.Article;
 import org.example.blogsakura.interfaces.vo.blog.article.ArticleVO;
 import org.example.blogsakura.application.service.ArticleApplicationService;
 import org.example.blogsakura.domain.blog.ranking.service.RankingListService;
+import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.ArrayList;
@@ -14,7 +15,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@Service
 public class RaningListServiceImpl implements RankingListService {
+
+    private static final String RANKING_KEY = "article:ranking";
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -29,13 +33,20 @@ public class RaningListServiceImpl implements RankingListService {
      */
     @Override
     public List<ArticleVO> getRankingList() {
-        Set<String> articleIds = stringRedisTemplate.opsForZSet().reverseRangeByScore(
-                "ranking", Double.MIN_VALUE, Double.MAX_VALUE, 0, 10
-        );
+        Set<String> articleIds = stringRedisTemplate.opsForZSet().reverseRange(
+                RANKING_KEY, 0, 9);
         if (articleIds == null || articleIds.isEmpty()) {
             return Collections.emptyList();
         }
         return convertToRankList(articleIds);
+    }
+
+    @Override
+    public void increaseRankingScore(Long articleId) {
+        if (articleId == null) {
+            return;
+        }
+        stringRedisTemplate.opsForZSet().incrementScore(RANKING_KEY, String.valueOf(articleId), 1D);
     }
 
     /**

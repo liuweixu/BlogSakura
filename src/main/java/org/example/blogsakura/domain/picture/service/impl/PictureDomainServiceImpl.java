@@ -303,7 +303,7 @@ public class PictureDomainServiceImpl extends ServiceImpl<PictureMapper, Picture
         // 操作数据库
         boolean result = this.removeById(id);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-        return result;
+        return true;
     }
 
 }

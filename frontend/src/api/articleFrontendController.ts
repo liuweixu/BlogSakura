@@ -36,6 +36,14 @@ export async function getFrontendArticleVoListFeatures(options?: {
   });
 }
 
+/** 此处后端没有提供注释 GET /article/ranking/list */
+export async function getFrontendRankingList(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListArticleVO>("/article/ranking/list", {
+    method: "GET",
+    ...(options || {}),
+  });
+}
+
 /** 此处后端没有提供注释 POST /article/list/page/vo */
 export async function getFrontendArticleVoListByPage(
   body: API.ArticleQueryRequest,
