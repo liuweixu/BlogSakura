@@ -18,11 +18,17 @@ function App() {
         }}
       >
         <Feature />
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="w-full lg:w-3/4">
+        <div className="w-full h-auto mt-14 inline-block">
+          <h1 className="text-[#666] font-bold mt-2.5 mb-7.5 border-b border-dashed border-[#ececec]">
+            <i className="iconfont icon-envira" />
+            <span> Discovery</span>
+          </h1>
+        </div>
+        <div className="flex flex-col lg:flex-row items-start gap-8">
+          <div className="w-full lg:w-[72%]">
             <ListWrapper />
           </div>
-          <div className="w-full lg:w-1/4 mt-14">
+          <div className="w-full lg:w-[28%]">
             <RankingList />
           </div>
         </div>

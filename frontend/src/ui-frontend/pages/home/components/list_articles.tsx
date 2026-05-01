@@ -144,12 +144,6 @@ export function ListWrapper() {
 
   return (
     <div className="w-full">
-      <div className="w-full h-auto mt-14 inline-block">
-        <h1 className="text-[#666] font-bold mt-2.5 mb-7.5 border-b border-dashed border-[#ececec]">
-          <i className="iconfont icon-envira" />
-          <span> Discovery</span>
-        </h1>
-      </div>
       {list_articles()}
       <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
         <Pagination
