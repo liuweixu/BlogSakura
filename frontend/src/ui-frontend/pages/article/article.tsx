@@ -75,21 +75,27 @@ function App() {
         </div>
       </div>
       {/**MainWrapper 正文内容 */}
-      <div className="min-h-[600px] max-w-[850px] p-[0_10px] ml-auto mr-auto pt-[50px] bg-white-80">
+      <div className="min-h-[600px] max-w-[900px] px-4 pb-16 pt-10 mx-auto sm:px-6">
         {data ? (
           <div className="flex-items">
             <div className="cell">
               <div
-                className="entry-content"
-                id="content"
-                dangerouslySetInnerHTML={{
-                  __html: marked(data?.content || ""),
-                }}
-              />
+                className="rounded-2xl border border-slate-200/90 bg-white px-5 py-8 shadow-sm sm:px-10 sm:py-10"
+              >
+                <div
+                  className="entry-content markdown-body"
+                  id="content"
+                  dangerouslySetInnerHTML={{
+                    __html: marked(data?.content || ""),
+                  }}
+                />
+              </div>
             </div>
           </div>
         ) : (
-          <div>Loading...</div>
+          <div className="mx-auto max-w-[900px] px-4 py-16 text-center text-slate-500">
+            Loading...
+          </div>
         )}
       </div>
     </div>

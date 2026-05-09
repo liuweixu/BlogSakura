@@ -50,22 +50,26 @@
 
 .entry-content ul {
     list-style: disc;
-    border: 1px dashed #e4e4e4;
-    padding: 15px 10px 15px 50px;
-    color: #616161;
+    border: 1px solid #e8eaed;
+    padding: 18px 20px 18px 52px;
+    color: #4a5565;
     margin-left: 0;
-    border-radius: 10px;
-    margin: 16px 0;
+    border-radius: 12px;
+    margin: 20px 0;
+    background: #fafbfc;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 .entry-content ol {
     list-style: decimal;
-    border: 1px dashed #e4e4e4;
-    padding: 15px 10px 15px 50px;
-    color: #616161;
+    border: 1px solid #e8eaed;
+    padding: 18px 20px 18px 52px;
+    color: #4a5565;
     margin-left: 0;
-    border-radius: 10px;
-    margin: 16px 0;
+    border-radius: 12px;
+    margin: 20px 0;
+    background: #fafbfc;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 .entry-content table {
@@ -109,97 +113,70 @@
 
 .entry-content ol li,
 .entry-content ul li {
-    padding: 8px 0
-}
-
-.entry-content h3 {
-    padding-bottom: 8px;
-    border-bottom: 1px dashed #ddd;
-    color: #737373;
-    margin: 17px 0;
+    padding: 10px 0;
+    line-height: 1.65;
 }
 
 .entry-content h3,
 .entry-content h4,
 .entry-content h5 {
-    padding-left: 16px;
+    padding-left: 0;
 }
 
 .entry-content h1 {
-    margin: 16px 0;
+    margin: 20px 0 16px;
     clear: both;
-    font-size: 24px;
-    color: rgb(64, 64, 64);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #1a1a1a;
 }
 
 .entry-content h2 {
-    margin: 18px 0;
+    margin: 28px 0 14px;
     clear: both;
-    font-size: 22px;
-    color: rgb(64, 64, 64);
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: #1f2937;
+    padding-bottom: 0.45em;
+    border-bottom: 1px solid #eceff3;
 }
 
 .entry-content h3 {
-    margin: 17px 0;
+    margin: 24px 0 12px;
     clear: both;
-    font-size: 20px;
-    color: rgb(64, 64, 64);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #374151;
 }
 
 .entry-content h4 {
-    margin: 16px 0;
+    margin: 20px 0 10px;
     clear: both;
-    font-size: 18px;
-    color: rgb(64, 64, 64);
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: #4b5563;
 }
 
 .entry-content h5 {
-    margin: 15px 0;
+    margin: 18px 0 8px;
     clear: both;
-    font-size: 16px;
-    color: rgb(64, 64, 64);
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6b7280;
 }
 
 .entry-content h6 {
-    margin: 14px 0;
+    margin: 16px 0 8px;
     clear: both;
-    font-size: 14px;
-    color: rgb(64, 64, 64);
-}
-
-.entry-content h2:after,
-.entry-content h1:after {
-    content: "\\00B6";
-    position: absolute;
-    color: #ff6d6d;
-    font-family: 'Merriweather Sans', Helvetica, Tahoma, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft Yahei', 'WenQuanYi Micro Hei', sans-serif;
-    padding-left: 6px;
-    font-size: 1.03em;
-}
-
-.entry-content h3:after {
-    content: "#";
-    left: 0;
-    position: absolute;
-    color: #ff6d6d;
-}
-
-.entry-content h4:after {
-    content: "â–Œ";
-    left: 0;
-    position: absolute;
-    color: #ff6d6d;
-}
-
-.entry-content h5:after {
-    content: "â™¯";
-    left: 0;
-    position: absolute;
-    color: #ff6d6d;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6b7280;
 }
 
 .entry-content a {
-    color: #e67474;
+    color: #c2410c;
     position: relative;
 }
 
@@ -227,9 +204,10 @@
 }
 
 .entry-content p {
-    color: #797979;
-    margin: 15px 0 22px;
-    line-height: 30px;
+    color: #4b5563;
+    margin: 14px 0 20px;
+    line-height: 1.75;
+    font-size: 1.02rem;
 }
 
 .entry-content hr {
