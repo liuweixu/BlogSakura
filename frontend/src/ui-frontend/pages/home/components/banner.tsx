@@ -6,7 +6,9 @@ export const Banner = () => {
     <div
       id="banner-wrapper"
       className="relative overflow-hidden h-auto z-0 before:content-[''] before:absolute before:inset-0 before:z-3 before:bg-fixed 
-      before:bg-[url('statics/images/grid.png')]"
+      before:bg-[url('statics/images/grid.png')]
+      after:content-[''] after:absolute after:inset-0 after:z-25 after:pointer-events-none
+      after:bg-[repeating-linear-gradient(to_bottom,rgba(0,0,0,0.04)_0px,rgba(0,0,0,0.04)_1px,transparent_1px,transparent_5px)]"
     >
       {/**三条波浪 */}
       <div
