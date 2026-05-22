@@ -119,6 +119,14 @@
     margin: 17px 0;
 }
 
+.entry-content h1,
+.entry-content h2,
+.entry-content h3,
+.entry-content h4,
+.entry-content h5 {
+    position: relative;
+}
+
 .entry-content h3,
 .entry-content h4,
 .entry-content h5 {
@@ -169,7 +177,7 @@
 
 .entry-content h2:after,
 .entry-content h1:after {
-    content: "\\00B6";
+    content: "\00B6";
     position: absolute;
     color: #ff6d6d;
     font-family: 'Merriweather Sans', Helvetica, Tahoma, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft Yahei', 'WenQuanYi Micro Hei', sans-serif;
@@ -185,14 +193,14 @@
 }
 
 .entry-content h4:after {
-    content: "â–Œ";
+    content: "\258C";
     left: 0;
     position: absolute;
     color: #ff6d6d;
 }
 
 .entry-content h5:after {
-    content: "â™¯";
+    content: "\266F";
     left: 0;
     position: absolute;
     color: #ff6d6d;
