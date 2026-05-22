@@ -1,4 +1,5 @@
 import { Affix } from "antd";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   HomeOutlined,
@@ -12,6 +13,26 @@ function App() {
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const updateScrollProgress = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      setScrollProgress(Math.min(100, Math.max(0, progress)));
+    };
+
+    updateScrollProgress();
+    window.addEventListener("scroll", updateScrollProgress, { passive: true });
+    window.addEventListener("resize", updateScrollProgress, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", updateScrollProgress);
+      window.removeEventListener("resize", updateScrollProgress);
+    };
+  }, [location.pathname]);
 
   const navItems = [
     { path: "/", label: "首页", icon: HomeOutlined },
@@ -38,6 +59,11 @@ function App() {
           id="nav-wrapper"
           className="fixed w-full h-19 px-7.5 transition-all duration-400 ease-in-out bg-white/90 shadow-[0_1px_40px_-8px_rgba(0,0,0,.5)]"
         >
+          <div
+            id="scroll-progress"
+            className="absolute top-0 left-0 h-1 bg-[#fe9600] z-50 pointer-events-none transition-[width] duration-75 ease-out"
+            style={{ width: `${scrollProgress}%` }}
+          />
           <div className="flex justify-between items-center">
             <div id="nav-left" className="h-19 leading-19 flex items-center">
               <Link
