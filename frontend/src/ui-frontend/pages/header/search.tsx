@@ -3,8 +3,19 @@ import { Input, List, Spin, Empty } from "antd";
 import { useNavigate } from "react-router-dom";
 import { searchArticleByTitleOrContent } from "@/api/esController";
 import { SearchOutlined } from "@ant-design/icons";
+import { stripHtml, toSearchSnippet } from "@/ui-frontend/utils/html";
 
 const { Search } = Input;
+
+function getSearchResultText(item: Record<string, unknown>) {
+  const rawTitle = item?.title ?? item?.articleTitle ?? item?.name ?? "结果";
+  const title =
+    typeof rawTitle === "string" ? stripHtml(rawTitle) : String(rawTitle);
+  const snippet = toSearchSnippet(
+    item?.highlight ?? item?.content ?? item?.articleContent
+  );
+  return { title, snippet };
+}
 
 interface SimpleSearchProps {
   mode?: "icon" | "input";
@@ -140,16 +151,7 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ mode = "icon" }) => {
                       dataSource={results}
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       renderItem={(item: any) => {
-                        // 尝试适配可能的结构：优先 title，其次 content 片段，否则 JSON 串
-                        const title =
-                          item?.title ??
-                          item?.articleTitle ??
-                          item?.name ??
-                          "结果";
-                        const snippet =
-                          item?.highlight ??
-                          item?.content ??
-                          item?.articleContent;
+                        const { title, snippet } = getSearchResultText(item);
                         return (
                           <List.Item
                             className="px-3 hover:bg-gray-50 cursor-pointer"
@@ -170,15 +172,9 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ mode = "icon" }) => {
                               {snippet && (
                                 <div
                                   className="text-[12px] text-gray-500 mt-0.5 line-clamp-2"
-                                  title={
-                                    typeof snippet === "string"
-                                      ? snippet
-                                      : JSON.stringify(snippet)
-                                  }
+                                  title={snippet}
                                 >
-                                  {typeof snippet === "string"
-                                    ? snippet
-                                    : JSON.stringify(snippet)}
+                                  {snippet}
                                 </div>
                               )}
                             </div>
@@ -233,11 +229,7 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ mode = "icon" }) => {
               dataSource={results}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               renderItem={(item: any) => {
-                // 尝试适配可能的结构：优先 title，其次 content 片段，否则 JSON 串
-                const title =
-                  item?.title ?? item?.articleTitle ?? item?.name ?? "结果";
-                const snippet =
-                  item?.highlight ?? item?.content ?? item?.articleContent;
+                const { title, snippet } = getSearchResultText(item);
                 return (
                   <List.Item
                     className="px-3 hover:bg-gray-50 cursor-pointer"
@@ -253,15 +245,9 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ mode = "icon" }) => {
                       {snippet && (
                         <div
                           className="text-[12px] text-gray-500 mt-0.5 line-clamp-2"
-                          title={
-                            typeof snippet === "string"
-                              ? snippet
-                              : JSON.stringify(snippet)
-                          }
+                          title={snippet}
                         >
-                          {typeof snippet === "string"
-                            ? snippet
-                            : JSON.stringify(snippet)}
+                          {snippet}
                         </div>
                       )}
                     </div>
